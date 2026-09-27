@@ -85,33 +85,70 @@ def load_csv(path: Path) -> list[ParsedDocument]:
 
     documents: list[ParsedDocument] = []
 
-    with path.open("r", encoding="utf-8-sig", newline="") as file:
-        reader = csv.DictReader(file)
+    for encoding in ("utf-8-sig", "cp1252"):
+        try:
+            with path.open("r", encoding=encoding, newline="") as file:
+                rows = list(csv.reader(file))
+            break
+        except UnicodeDecodeError:
+            continue
 
-        for row_number, row in enumerate(reader, start=2):
-            fields = [
-                f"{column}: {clean_text(value)}"
+    else:
+        raise UnicodeError(f"Could not decode CSV file: {path}")
 
-                for column, value in row.items()
-                if column and value and clean_text(value)
-            ]
-            text = "\n".join(fields)
+    if not rows:
+        return documents
 
-            if not text:
-                continue
+    # Spreadsheet exports may contain report titles and summaries above
+    # the real header. The first highly populated row is usually the header.
 
-            documents.append(
-                ParsedDocument(
-                    text=text,
-                    metadata={
-                        "title": path.stem,
-                        "source": str(path),
-                        "source_type": "csv",
-                        "row": row_number,
-                    },
-                )
+    candidate_rows = rows[:20]
+    header_index = max(
+
+        range(len(candidate_rows)),
+        key=lambda index: sum(
+            bool(cell.strip()) for cell in candidate_rows[index]
+        ),
+    )
+
+    headers = [clean_text(cell) for cell in rows[header_index]]
+    populated_headers = [header for header in headers if header]
+
+    if len(populated_headers) < 2:
+        raise ValueError(f"Could not identify a CSV header row in {path}")
+
+    for row_number, values in enumerate(
+        rows[header_index + 1 :],
+        start=header_index + 2,
+    ):
+        row = {
+            header: value
+            for header, value in zip(headers, values)
+            if header
+        }
+
+        fields = [
+            f"{column}: {clean_text(value)}"
+            for column, value in row.items()
+            if value and clean_text(value)
+        ]
+        text = "\n".join(fields)
+
+        if not text:
+            continue
+
+        documents.append(
+            ParsedDocument(
+                text=text,
+                metadata={
+                    "title": path.stem,
+                    "source": str(path),
+                    "source_type": "csv",
+                    "header_row": header_index + 1,
+                    "row": row_number,
+                },
             )
-
+        )
     return documents
 
 def load_document(file_path: str | Path) -> list[ParsedDocument]:
@@ -130,3 +167,27 @@ def load_document(file_path: str | Path) -> list[ParsedDocument]:
         return load_csv(path)
 
     raise ValueError(f"Unsupported file type: {suffix}")
+
+
+
+
+
+def load_directory(
+    directory_path: str | Path,
+    extensions: set[str] | None = None,
+) -> list[ParsedDocument]:
+    """Load all supported files directly inside a directory."""
+
+    directory = Path(directory_path)
+
+    if not directory.is_dir():
+        raise NotADirectoryError(f"Directory not found: {directory}")
+
+    supported = extensions or {".md", ".markdown", ".pdf", ".csv"}
+    documents: list[ParsedDocument] = []
+
+    for path in sorted(directory.iterdir()):
+        if path.is_file() and path.suffix.lower() in supported:
+            documents.extend(load_document(path))
+
+    return documents
