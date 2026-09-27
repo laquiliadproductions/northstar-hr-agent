@@ -1,0 +1,58 @@
+Northstar Analytics PTO Balances,,,,,,,,,,,,,,,,
+Balance as of,09/26/2026,,,,,,,,,,,,,,,
+"Illustrative balances. Allowance is 15 days for individual contributors, 20 for managers, and 25 for directors, vice presidents, and executives, plus 2 days after five years of service.",,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,
+Employees,50,,Total Current Balance,511.9,,Under 5 Days,15,,Pending PTO Days,73.5,,,,,,
+,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,
+Employee ID,First Name,Last Name,Email Address,Department,Job Title,Employment Type,Management Level,Start Date,Annual PTO Allowance (Days),Carryover (Days),Accrued YTD (Days),Used YTD (Days),Pending Requests (Days),Current Balance (Days),Available After Pending (Days),As of Date
+NSA-0001,Maya,Chen,maya.chen@northstaranalytics.com,Executive,Chief Executive Officer,Salary,Executive,02/12/2018,27.0,0.0,19.9,3.0,0.0,16.9,16.9,09/26/2026
+NSA-0002,Daniel,Okafor,daniel.okafor@northstaranalytics.com,Executive,Chief Technology Officer,Salary,Executive,05/07/2018,27.0,1.5,19.9,6.0,0.0,15.4,15.4,09/26/2026
+NSA-0003,Elena,Rodriguez,elena.rodriguez@northstaranalytics.com,Executive,Chief Operating Officer,Salary,Executive,08/20/2018,27.0,3.0,19.9,9.0,0.5,13.9,13.4,09/26/2026
+NSA-0004,Priya,Nair,priya.nair@northstaranalytics.com,Executive,Chief Data Officer,Salary,Executive,01/14/2019,27.0,5.0,19.9,12.0,1.0,12.9,11.9,09/26/2026
+NSA-0005,Oliver,Bennett,oliver.bennett@northstaranalytics.com,Executive,Chief Revenue Officer,Salary,Executive,03/04/2019,27.0,2.5,19.9,3.0,2.0,19.4,17.4,09/26/2026
+NSA-0006,Aisha,Rahman,aisha.rahman@northstaranalytics.com,Data Science,"VP, Data Science",Salary,Vice President,06/17/2019,27.0,0.0,19.9,6.0,3.0,13.9,10.9,09/26/2026
+NSA-0007,Ethan,Park,ethan.park@northstaranalytics.com,Data Science,Director of Machine Learning,Salary,Director,09/09/2019,27.0,1.5,19.9,9.0,4.0,12.4,8.4,09/26/2026
+NSA-0008,Sofia,Martinez,sofia.martinez@northstaranalytics.com,Data Science,Senior Data Scientist,Salary,Individual Contributor,01/27/2020,17.0,3.0,12.5,12.0,0.0,3.5,3.5,09/26/2026
+NSA-0009,Liam,O'Connor,liam.oconnor@northstaranalytics.com,Data Science,Senior Data Scientist,Salary,Individual Contributor,04/13/2020,17.0,5.0,12.5,3.0,0.0,14.5,14.5,09/26/2026
+NSA-0010,Nia,Thompson,nia.thompson@northstaranalytics.com,Data Science,Data Scientist,Salary,Individual Contributor,07/06/2020,17.0,2.5,12.5,6.0,0.5,9.0,8.5,09/26/2026
+NSA-0011,Arjun,Mehta,arjun.mehta@northstaranalytics.com,Data Science,Machine Learning Scientist,Salary,Individual Contributor,09/21/2020,17.0,0.0,12.5,9.0,1.0,3.5,2.5,09/26/2026
+NSA-0012,Chloe,Dubois,chloe.dubois@northstaranalytics.com,Data Science,Analytics Engineer,Salary,Individual Contributor,11/16/2020,17.0,1.5,12.5,12.0,2.0,2.0,0.0,09/26/2026
+NSA-0013,Marcus,Green,marcus.green@northstaranalytics.com,Data Science,Data Labeling Specialist,Hourly,Individual Contributor,01/11/2021,17.0,3.0,12.5,3.0,3.0,12.5,9.5,09/26/2026
+NSA-0014,Grace,Kim,grace.kim@northstaranalytics.com,Engineering,"VP, Engineering",Salary,Vice President,02/22/2021,27.0,5.0,19.9,6.0,4.0,18.9,14.9,09/26/2026
+NSA-0015,Noah,Williams,noah.williams@northstaranalytics.com,Engineering,Director of Platform Engineering,Salary,Director,04/05/2021,27.0,2.5,19.9,9.0,0.0,13.4,13.4,09/26/2026
+NSA-0016,Isabella,Rossi,isabella.rossi@northstaranalytics.com,Engineering,Engineering Manager,Salary,Manager,05/17/2021,22.0,0.0,16.2,12.0,0.0,4.2,4.2,09/26/2026
+NSA-0017,Mateo,Silva,mateo.silva@northstaranalytics.com,Engineering,Principal Software Engineer,Salary,Individual Contributor,06/28/2021,17.0,1.5,12.5,3.0,0.5,11.0,10.5,09/26/2026
+NSA-0018,Harper,Johnson,harper.johnson@northstaranalytics.com,Engineering,Senior Backend Engineer,Salary,Individual Contributor,08/09/2021,17.0,3.0,12.5,6.0,1.0,9.5,8.5,09/26/2026
+NSA-0019,Kenji,Tanaka,kenji.tanaka@northstaranalytics.com,Engineering,Senior Frontend Engineer,Salary,Individual Contributor,09/20/2021,17.0,5.0,12.5,9.0,2.0,8.5,6.5,09/26/2026
+NSA-0020,Amara,Diallo,amara.diallo@northstaranalytics.com,Engineering,Cloud Infrastructure Engineer,Salary,Individual Contributor,10/25/2021,15.0,2.5,11.1,12.0,3.0,1.6,-1.4,09/26/2026
+NSA-0021,Finn,Murphy,finn.murphy@northstaranalytics.com,Engineering,DevOps Engineer,Salary,Individual Contributor,12/06/2021,15.0,0.0,11.1,3.0,4.0,8.1,4.1,09/26/2026
+NSA-0022,Zoe,Patel,zoe.patel@northstaranalytics.com,Engineering,Quality Engineering Lead,Salary,Manager,01/24/2022,20.0,1.5,14.7,6.0,0.0,10.2,10.2,09/26/2026
+NSA-0023,Caleb,Brooks,caleb.brooks@northstaranalytics.com,Product,"VP, Product",Salary,Vice President,03/07/2022,25.0,3.0,18.4,9.0,0.0,12.4,12.4,09/26/2026
+NSA-0024,Mei,Lin,mei.lin@northstaranalytics.com,Product,Director of Product Management,Salary,Director,04/18/2022,25.0,5.0,18.4,12.0,0.5,11.4,10.9,09/26/2026
+NSA-0025,Lucas,Moreau,lucas.moreau@northstaranalytics.com,Product,Senior Product Manager,Salary,Senior Manager,05/23/2022,20.0,2.5,14.7,3.0,1.0,14.2,13.2,09/26/2026
+NSA-0026,Fatima,Hassan,fatima.hassan@northstaranalytics.com,Product,Product Manager,Salary,Manager,07/11/2022,20.0,0.0,14.7,6.0,2.0,8.7,6.7,09/26/2026
+NSA-0027,Owen,Reed,owen.reed@northstaranalytics.com,Product,UX Researcher,Salary,Individual Contributor,08/29/2022,15.0,1.5,11.1,9.0,3.0,3.6,0.6,09/26/2026
+NSA-0028,Camila,Torres,camila.torres@northstaranalytics.com,Sales,"VP, Sales",Salary,Vice President,10/03/2022,25.0,3.0,18.4,12.0,4.0,9.4,5.4,09/26/2026
+NSA-0029,James,Walker,james.walker@northstaranalytics.com,Sales,Director of Enterprise Sales,Salary,Director,11/14/2022,25.0,5.0,18.4,3.0,0.0,20.4,20.4,09/26/2026
+NSA-0030,Ava,Singh,ava.singh@northstaranalytics.com,Sales,Enterprise Account Executive,Salary,Individual Contributor,01/09/2023,15.0,2.5,11.1,6.0,0.0,7.6,7.6,09/26/2026
+NSA-0031,Benjamin,Foster,benjamin.foster@northstaranalytics.com,Sales,Account Executive,Salary,Individual Contributor,02/20/2023,15.0,0.0,11.1,9.0,0.5,2.1,1.6,09/26/2026
+NSA-0032,Leila,Khan,leila.khan@northstaranalytics.com,Sales,"Account Executive, EMEA",Salary,Individual Contributor,03/27/2023,15.0,1.5,11.1,11.5,1.0,1.1,0.1,09/26/2026
+NSA-0033,Seamus,Byrne,seamus.byrne@northstaranalytics.com,Sales,Sales Development Representative,Salary,Individual Contributor,05/08/2023,15.0,3.0,11.1,3.0,2.0,11.1,9.1,09/26/2026
+NSA-0034,Natalie,Carter,natalie.carter@northstaranalytics.com,Marketing,Director of Marketing,Salary,Director,06/12/2023,25.0,5.0,18.4,6.0,3.0,17.4,14.4,09/26/2026
+NSA-0035,Hugo,Laurent,hugo.laurent@northstaranalytics.com,Marketing,Product Marketing Manager,Salary,Manager,07/24/2023,20.0,2.5,14.7,9.0,4.0,8.2,4.2,09/26/2026
+NSA-0036,Jasmine,Lee,jasmine.lee@northstaranalytics.com,Marketing,Content Marketing Manager,Salary,Manager,09/05/2023,20.0,0.0,14.7,12.0,0.0,2.7,2.7,09/26/2026
+NSA-0037,Diego,Ramirez,diego.ramirez@northstaranalytics.com,Marketing,Demand Generation Specialist,Salary,Individual Contributor,10/16/2023,15.0,1.5,11.1,3.0,0.0,9.6,9.6,09/26/2026
+NSA-0038,Rachel,Adams,rachel.adams@northstaranalytics.com,Customer Success,Director of Customer Success,Salary,Director,11/27/2023,25.0,3.0,18.4,6.0,0.5,15.4,14.9,09/26/2026
+NSA-0039,Samir,Gupta,samir.gupta@northstaranalytics.com,Customer Success,Senior Customer Success Manager,Salary,Senior Manager,01/08/2024,20.0,5.0,14.7,9.0,1.0,10.7,9.7,09/26/2026
+NSA-0040,Emily,Nguyen,emily.nguyen@northstaranalytics.com,Customer Success,Customer Success Manager,Salary,Manager,02/12/2024,20.0,2.5,14.7,12.0,2.0,5.2,3.2,09/26/2026
+NSA-0041,Tariq,Wilson,tariq.wilson@northstaranalytics.com,Customer Success,Technical Support Specialist,Hourly,Individual Contributor,03/18/2024,15.0,0.0,11.1,3.0,3.0,8.1,5.1,09/26/2026
+NSA-0042,Victor,Alvarez,victor.alvarez@northstaranalytics.com,Finance,"VP, Finance",Salary,Vice President,04/29/2024,25.0,1.5,18.4,6.0,4.0,13.9,9.9,09/26/2026
+NSA-0043,Hannah,Schmidt,hannah.schmidt@northstaranalytics.com,Finance,Controller,Salary,Director,06/10/2024,25.0,3.0,18.4,9.0,0.0,12.4,12.4,09/26/2026
+NSA-0044,Kwame,Mensah,kwame.mensah@northstaranalytics.com,Finance,Senior Financial Analyst,Salary,Individual Contributor,07/22/2024,15.0,5.0,11.1,12.0,0.0,4.1,4.1,09/26/2026
+NSA-0045,Monica,Evans,monica.evans@northstaranalytics.com,People Operations,Director of People Operations,Salary,Director,09/03/2024,25.0,2.5,18.4,3.0,0.5,17.9,17.4,09/26/2026
+NSA-0046,Sophie,Taylor,sophie.taylor@northstaranalytics.com,People Operations,People Operations Coordinator,Hourly,Individual Contributor,10/14/2024,15.0,0.0,11.1,6.0,1.0,5.1,4.1,09/26/2026
+NSA-0047,Ibrahim,Said,ibrahim.said@northstaranalytics.com,IT & Security,Director of IT & Security,Salary,Director,01/13/2025,25.0,1.5,18.4,9.0,2.0,10.9,8.9,09/26/2026
+NSA-0048,Madison,Clark,madison.clark@northstaranalytics.com,IT & Security,IT Support Specialist,Hourly,Individual Contributor,03/03/2025,15.0,3.0,11.1,12.0,3.0,2.1,-0.9,09/26/2026
+NSA-0049,Charlotte,King,charlotte.king@northstaranalytics.com,Legal & Compliance,General Counsel,Salary,Vice President,06/16/2025,25.0,5.0,18.4,3.0,4.0,20.4,16.4,09/26/2026
+NSA-0050,Aaron,Davis,aaron.davis@northstaranalytics.com,Operations,Office & Operations Manager,Salary,Manager,01/12/2026,20.0,2.5,14.1,6.0,0.0,10.6,10.6,09/26/2026
