@@ -28,11 +28,27 @@ def clean_text(text: str) -> str:
     text = re.sub(r"\n{3,}", "\n\n", text)
     return text.strip()
 
+def source_title(path: Path) -> str:
+    """Convert a numbered source filename into a readable title."""
+
+    title = re.sub(r"^\d+\.", "", path.stem)
+    title = re.sub(r"[_-]+", " ", title)
+    return re.sub(r"\s+", " ", title).strip()
+
 def markdown_title(text: str, fallback: str) -> str:
-    """Use the first level-one Markdown heading as the title."""
+    """Use a non-numbered H1 heading or a cleaned filename."""
 
     match = re.search(r"^#\s+(.+)$", text, flags=re.MULTILINE)
-    return match.group(1).strip() if match else fallback
+
+    if not match:
+        return fallback
+
+    title = match.group(1).strip()
+
+    if re.match(r"^\d+(?:\.\d+)*\s+", title):
+        return fallback
+
+    return title
 
 def load_markdown(path: Path) -> list[ParsedDocument]:
     """Load one Markdown file."""
@@ -47,7 +63,7 @@ def load_markdown(path: Path) -> list[ParsedDocument]:
             text=text,
 
             metadata={
-                "title": markdown_title(text, path.stem),
+                "title": markdown_title(text, source_title(path)),
                 "source": str(path),
                 "source_type": "markdown",
             },
@@ -70,7 +86,7 @@ def load_pdf(path: Path) -> list[ParsedDocument]:
             ParsedDocument(
                 text=text,
                 metadata={
-                    "title": path.stem,
+                    "title": source_title(path),
                     "source": str(path),
                     "source_type": "pdf",
                     "page": page_number,
@@ -141,7 +157,7 @@ def load_csv(path: Path) -> list[ParsedDocument]:
             ParsedDocument(
                 text=text,
                 metadata={
-                    "title": path.stem,
+                    "title": source_title(path),
                     "source": str(path),
                     "source_type": "csv",
                     "header_row": header_index + 1,
