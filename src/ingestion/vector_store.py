@@ -96,6 +96,7 @@ def upsert_embeddings(
 def query_collection(
     query: str,
     n_results: int = 5,
+    where: dict[str, Any] | None = None,
     database_path: str | Path = DEFAULT_DB_PATH,
     collection_name: str = DEFAULT_COLLECTION_NAME,
 ) -> dict[str, Any]:
@@ -112,12 +113,16 @@ def query_collection(
 
     result_count = min(n_results, collection_size)
 
-    return collection.query(
-        query_embeddings=[embed_query(query)],
-        n_results=result_count,
-        include=["documents", "metadatas", "distances"],
-    )
+    query_arguments: dict[str, Any] = {
+        "query_embeddings": [embed_query(query)],
+        "n_results": result_count,
+        "include": ["documents", "metadatas", "distances"],
+    }
 
+    if where:
+        query_arguments["where"] = where
+
+    return collection.query(**query_arguments)
 def collection_count(
     database_path: str | Path = DEFAULT_DB_PATH,
     collection_name: str = DEFAULT_COLLECTION_NAME,
