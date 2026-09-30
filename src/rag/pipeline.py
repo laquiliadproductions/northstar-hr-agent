@@ -6,7 +6,11 @@ from typing import Any
 from langchain_openai import ChatOpenAI
 from config import RETRIEVAL_TOP_K
 from settings import get_settings
-from src.rag.citations import Citation, build_citations
+from src.rag.citations import (
+    Citation,
+    build_citations,
+    normalize_source_markers,
+)
 
 from src.rag.guardrails import (
     AnswerStatus,
@@ -15,7 +19,6 @@ from src.rag.guardrails import (
     classify_answer,
 )
 
-from src.rag.prompts import build_grounded_messages
 from src.rag.prompts import build_grounded_messages
 from src.retrieval.retriever import RetrievalResult, retrieve
 
@@ -74,7 +77,9 @@ def answer_question(
     if not isinstance(response.content, str):
         raise RuntimeError("The model returned non-text content")
 
-    answer = response.content.strip()
+    answer = normalize_source_markers(
+        response.content.strip()
+    )
     citations = build_citations(answer, results)
 
     return RAGAnswer(

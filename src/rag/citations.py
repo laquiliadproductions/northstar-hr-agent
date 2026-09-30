@@ -8,9 +8,16 @@ import re
 
 from src.retrieval.retriever import RetrievalResult
 
-SOURCE_GROUP_PATTERN = re.compile(r"\[([^\]]+)\]")
+SOURCE_GROUP_PATTERN = re.compile(
+    r"[\[【]([^\]】]+)[\]】]"
+)
 SOURCE_NUMBER_PATTERN = re.compile(
     r"\bSource\s+(\d+)\b",
+    flags=re.IGNORECASE,
+)
+
+SOURCE_MARKER_NORMALIZATION_PATTERN = re.compile(
+    r"[\[【]((?:Source\s+\d+)(?:\s*,\s*Source\s+\d+)*)[\]】]",
     flags=re.IGNORECASE,
 )
 
@@ -35,6 +42,27 @@ class Citation:
         """Return the marker used in the generated answer."""
 
         return f"[Source {self.source_number}]"
+
+def normalize_source_markers(answer: str) -> str:
+    """Convert Unicode source markers to regular square brackets."""
+
+    def replace_group(match: re.Match[str]) -> str:
+        numbers = SOURCE_NUMBER_PATTERN.findall(match.group(1))
+        markers = ", ".join(
+            f"Source {number}" for number in numbers
+        )
+        return f"[{markers}]"
+
+    normalized = SOURCE_MARKER_NORMALIZATION_PATTERN.sub(
+        replace_group,
+        answer,
+    )
+
+    return re.sub(
+        r"[\u00a0\u202f]+(?=\[Source )",
+        " ",
+        normalized,
+    )
 
 def create_snippet(
     result: RetrievalResult,

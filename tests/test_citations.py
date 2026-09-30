@@ -3,7 +3,12 @@
 from __future__ import annotations
 import unittest
 
-from src.rag.citations import build_citations, extract_source_numbers
+from src.rag.citations import (
+    build_citations,
+    extract_source_numbers,
+    normalize_source_markers,
+)
+
 from src.retrieval.retriever import RetrievalResult
 
 class CitationTests(unittest.TestCase):
@@ -43,9 +48,27 @@ class CitationTests(unittest.TestCase):
 
         self.assertIn("120, 160, or 200 hours", citations[0].snippet)
 
+    def test_source_markers_are_normalized_for_display(self) -> None:
+        answer = normalize_source_markers(
+            "First\u202f[Source\u202f1]. "
+            "Second【Source\u202f2, Source 3】."
+        )
+
+        self.assertEqual(
+            answer,
+            "First [Source 1]. Second[Source 2, Source 3].",
+        )
+
     def test_unicode_space_in_marker_is_supported(self) -> None:
         numbers = extract_source_numbers(
             "Policy evidence [Source\u202f2]."
+        )
+
+        self.assertEqual(numbers, [2])
+
+    def test_unicode_brackets_are_supported(self) -> None:
+        numbers = extract_source_numbers(
+            "Policy evidence 【Source\u202f2】."
         )
 
         self.assertEqual(numbers, [2])
