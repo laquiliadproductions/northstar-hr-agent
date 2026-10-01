@@ -74,8 +74,8 @@ def classify_intent(user_message: str) -> RouteDecision:
 
     if has_pto_terms:
         selected_tools = [
-            "lookup_employee",
-            "get_pto_balance",
+            "lookup_employee_profile",
+            "check_pto_balance",
         ]
 
         if any(term in normalized for term in PTO_ACTION_TERMS):
@@ -95,7 +95,7 @@ def classify_intent(user_message: str) -> RouteDecision:
         return RouteDecision(
             intent=AgentIntent.REMOTE_WORK_ELIGIBILITY,
             rag_only=False,
-            selected_tools=("lookup_employee",),
+            selected_tools=("lookup_employee_profile",),
             decision_basis=(
                 "Remote-work eligibility requires employee context "
                 "and policy evidence."

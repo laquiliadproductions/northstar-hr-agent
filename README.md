@@ -10,8 +10,9 @@ The project currently implements corpus preparation, document ingestion, local e
 | Stage 2: Ingestion and indexing | Complete | Loading, cleaning, chunking, local embeddings, Chroma persistence, and citation metadata |
 | Stage 3: Retrieval-Augmented Generation | Complete | Top-k retrieval, metadata filtering, grounded prompts, verified citations, guardrails, tests, and a complex multi-document case |
 | User interface | Planned | Streamlit application |
-| Stage 4: Agentic system design | Complete | LangGraph orchestration, MCP employee and PTO tools, two multi-step workflows, operational traces, graceful failures, and confirmation-gated mock actions |
+| Stage 4: Agentic system design | Complete | LangGraph orchestration, multi-step HR workflows, operational traces, graceful failures, policy-aware reasoning, and confirmation-gated mock actions |
 | Full evaluation framework | Planned | Retrieval and generation metrics beyond the current automated tests |
+| Stage 5: MCP server and tool integration | Complete | Local stdio MCP server, five discoverable tools, RAG-backed policy retrieval, structured HR data access, confirmation-gated mock operations, and agent-to-MCP execution |
 
 ## Implemented Capabilities
 
@@ -32,6 +33,12 @@ The project currently implements corpus preparation, document ingestion, local e
 - Return cautious insufficient-evidence responses for unsupported policy questions
 - Distinguish policy facts from non-policy recommendations
 - Run a repeatable complex question requiring multiple policy documents
+- Route HR requests through deterministic LangGraph workflows
+- Retrieve fictional employee and PTO data through MCP tools
+- Expose policy evidence retrieval through MCP
+- Discover MCP tools and machine-readable input schemas
+- Execute confirmation-gated mock PTO operations with no real side effects
+- Produce operational traces containing tool selection, arguments, results, and escalation decisions
 
 ## Technology Stack
 
@@ -40,11 +47,13 @@ The project currently implements corpus preparation, document ingestion, local e
 - LangChain Core and LangChain OpenAI-compatible client
 - Groq free-tier inference for the current configuration
 - Chroma default local embedding function (`all-MiniLM-L6-v2`)
+- LangGraph for agent workflow orchestration
+- Model Context Protocol (MCP) 2.2.0 for agent tool integration over stdio
 - `tiktoken` for token-aware chunking
 - `pypdf` for PDF extraction
 - `pytest` for automated unit, workflow, safety, and regression tests
 
-## Architecture
+## RAG Architecture
 
 ```mermaid
 flowchart TD
@@ -65,34 +74,58 @@ The model generates answer text, but application code supplies and validates sou
 ```text
 northstar-hr-agent/
 ├── data/
-│   ├── policies/              # Fourteen fictional HR policy documents
-│   └── structured/            # Fictional employee and PTO CSV data
-├── chroma_db/                 # Persistent local vector index
+│   ├── policies/                  # Fourteen fictional HR policy documents
+│   └── structured/                # Fictional employee roster and PTO CSV data
+├── chroma_db/                     # Persistent local Chroma vector index
 ├── scripts/
-│   ├── build_policy_index.py  # Rebuild the complete policy index
-│   └── test_complex_rag.py    # Complex multi-document RAG demonstration
+│   ├── build_policy_index.py      # Rebuild the complete policy index
+│   ├── test_complex_rag.py        # Complex multi-document RAG demonstration
+│   └── run_agent.py               # Command-line entry point for agent workflows
 ├── src/
+│   ├── agent/
+│   │   ├── models.py              # Agent result and trace data models
+│   │   ├── nodes.py               # Shared LangGraph agent nodes
+│   │   ├── orchestrator.py        # Top-level agent execution
+│   │   ├── pto_action.py          # Confirmation-gated PTO mock action logic
+│   │   ├── pto_workflow.py        # Multi-step PTO workflow
+│   │   ├── rag_adapter.py         # Adapter between agent workflows and RAG
+│   │   ├── remote_workflow.py     # Multi-step remote-work workflow
+│   │   ├── router.py              # Intent and workflow routing
+│   │   └── state.py               # Agent workflow state definitions
 │   ├── ingestion/
-│   │   ├── loaders.py         # Markdown, PDF, and CSV loading
-│   │   ├── chunkers.py        # Citation-friendly token chunking
-│   │   ├── embeddings.py      # Local chunk and query embeddings
-│   │   ├── vector_store.py    # Chroma storage and search
-│   │   └── citations.py       # Ingestion citation utilities
+│   │   ├── loaders.py             # Markdown, PDF, and CSV loading
+│   │   ├── chunkers.py            # Citation-friendly token chunking
+│   │   ├── embeddings.py          # Local chunk and query embeddings
+│   │   ├── vector_store.py        # Chroma storage and search
+│   │   └── citations.py           # Ingestion citation utilities
+│   ├── mcp_server/
+│   │   ├── server.py              # MCP server and registered HR tools
+│   │   └── client.py              # MCP stdio client adapter used by the agent
+│   ├── rag/
+│   │   ├── prompts.py             # Grounded prompting strategy
+│   │   ├── citations.py           # Verified answer citations and snippets
+│   │   ├── guardrails.py          # Relevance and evidence guardrails
+│   │   └── pipeline.py            # End-to-end grounded RAG orchestration
 │   ├── retrieval/
-│   │   └── retriever.py       # Structured ranked retrieval results
-│   └── rag/
-│       ├── prompts.py         # Grounded prompting strategy
-│       ├── citations.py       # Verified answer citations and snippets
-│       ├── guardrails.py      # Relevance and evidence guardrails
-│       └── pipeline.py        # End-to-end RAG orchestration
+│   │   └── retriever.py           # Ranked Chroma policy retrieval
+│   └── tools/
+│       ├── hr_data.py              # Read-only employee roster access
+│       ├── pto_data.py             # Read-only PTO balance access
+│       └── mock_actions.py         # Confirmation-gated mock HR operations
 ├── tests/
-│   ├── test_retriever.py
+│   ├── test_agent_failures.py
+│   ├── test_agent_router.py
+│   ├── test_agent_workflows.py
 │   ├── test_citations.py
-│   └── test_guardrails.py
+│   ├── test_guardrails.py
+│   ├── test_hr_tools.py
+│   ├── test_mock_actions.py
+│   └── test_retriever.py
 ├── config.py
 ├── settings.py
 ├── requirements.txt
-└── .env.example
+├── .env.example
+└── README.md
 ```
 
 ## Stage 1: Data and Policy Corpus
@@ -124,7 +157,7 @@ Two fictional CSV datasets are stored under `data/structured/`:
 - Employee roster
 - PTO balances
 
-The structured CSV files support the Stage 4 employee and PTO MCP tools and are not added to the policy corpus.
+The structured CSV files support the Stage 4 agent workflows and the Stage 5 MCP employee and PTO tools. They are not added to the policy corpus.
 
 ## Stage 2: Ingestion and Vector Indexing
 
@@ -350,7 +383,7 @@ A successful result should:
 
 ### Agent Orchestrator
 
-`src/agent/orchestrator.py` defines a LangGraph orchestrator that classifies intent, decides whether RAG alone is sufficient, selects workflows and MCP tools, retrieves policy evidence, and returns a final response with an operational trace.
+`src/agent/orchestrator.py` defines a LangGraph orchestrator that classifies intent, decides whether RAG alone is sufficient, selects workflows and required HR capabilities, retrieves policy evidence, and returns a final response with an operational trace.
 
 ```mermaid
 
@@ -367,18 +400,6 @@ flowchart TD
 ```
 
 Routing is deterministic for supported workflows. This makes tool selection predictable and prevents the language model from independently authorizing actions.
-
-### MCP Tools
-
-The MCP 2.x server in `src/mcp_server/server.py` exposes:
-
-| Tool | Purpose | Side effects |
-|---|---|---|
-| `lookup_employee` | Find an employee by work email or exact full name | None |
-| `get_pto_balance` | Retrieve PTO balance by employee ID or work email | None |
-| `mock_submit_pto_request` | Preview or simulate a PTO request | None |
-
-The local MCP client uses the `stdio` transport. Tool failures are returned as structured statuses instead of uncaught exceptions.
 
 ### Multi-Step Workflows
 
@@ -425,25 +446,25 @@ All HR actions remain mock-only. Even after confirmation, no ticket, message, em
 Policy question:
 
 ```bash
-python -m scripts.run_agent "What expenses require manager approval?"
+PYTHONPATH=. python scripts/run_agent "What expenses require manager approval?"
 ```
 
 PTO guidance:
 
 ```bash
-python -m scripts.run_agent "What is my PTO balance?" --work-email maya.chen@northstaranalytics.com
+PYTHONPATH=. python scripts/run_agent "What is my PTO balance?" --work-email maya.chen@northstaranalytics.com
 ```
 
 Remote-work guidance:
 
 ```bash
-python -m scripts.run_agent "Am I eligible to work remotely?" --work-email maya.chen@northstaranalytics.com
+PYTHONPATH=. python scripts/run_agent "Am I eligible to work remotely?" --work-email maya.chen@northstaranalytics.com
 ```
 
 Mock PTO request:
 
 ```bash
-python -m scripts.run_agent "Submit a PTO request" --work-email maya.chen@northstaranalytics.com --start-date 2026-10-12 --end-date 2026-10-14 --requested-days 3
+PYTHONPATH=. python scripts/run_agent "Submit a PTO request" --work-email maya.chen@northstaranalytics.com --start-date 2026-10-12 --end-date 2026-10-14 --requested-days 3
 ```
 
 Add `--confirm` to explicitly confirm the mock action. Add `--show-trace` to display the operational trace as JSON.
@@ -571,3 +592,349 @@ The test suite does not require a live language-model call.
 - Streamlit user interface
 - Expanded retrieval and generation evaluation
 - Deployment to a suitable free-tier environment
+
+## Stage 5: MCP Server and Tool Integration
+### Architecture
+
+Stage 5 adds a Model Context Protocol (MCP) boundary between the Northstar HR agent and selected HR capabilities. The agent does not directly call the underlying employee, PTO, or mock-action functions. Instead, it invokes tools through the MCP client, which communicates with the Northstar MCP server.
+
+```text
+User
+  |
+  v
+Northstar HR Agent
+  |
+  v
+MCP Client
+  |
+  | stdio
+  v
+Northstar MCP Server
+  |
+  +--> search_policy_documents --> Chroma policy index
+  |
+  +--> get_policy_section ------> Chroma policy index
+  |
+  +--> lookup_employee_profile -> employee roster CSV
+  |
+  +--> check_pto_balance -------> PTO balances CSV
+  |
+  +--> mock_submit_pto_request -> confirmation-gated mock operation
+```
+
+### Transport Choice
+The Northstar MCP server uses the `stdio` transport. The agent client starts the MCP server as a local Python subprocess using:
+```text
+python -m src.mcp_server.server
+```
+
+The MCP client and server exchange MCP protocol messages through the subprocess standard input and standard output streams.
+
+`stdio` was selected because the Northstar HR agent and MCP server run in the same local project environment. This avoids introducing an unnecessary HTTP service, network port, or separate deployment while still maintaining an MCP boundary between the agent and its tools.
+
+The server starts with `server.run(transport="stdio")`. The client uses `StdioServerParameters`, `stdio_client`, and `ClientSession` to create and initialize an MCP session.
+
+### MCP Server and Client
+
+The MCP implementation is located under:
+
+```text
+src/mcp_server/
+├── __init__.py
+├── server.py
+└── client.py
+```
+`server.py` defines the Northstar MCP server and registers the HR tools. The server wraps existing retrieval and HR functions rather than duplicating their business logic.
+`client.py` provides the agent-side MCP adapter. It starts the local server process, initializes an MCP `ClientSession`, invokes tools by name with structured arguments, and converts MCP responses into controlled Python dictionaries for the agent workflows.
+
+### MCP Tool Discovery
+MCP clients can discover the server's available capabilities by initializing a session and calling `list_tools()`.
+
+Example:
+```python
+async with stdio_client(SERVER_PARAMETERS) as streams:
+    read_stream, write_stream = streams
+
+    async with ClientSession(read_stream, write_stream) as session:
+        await session.initialize()
+        result = await session.list_tools()
+
+        for tool in result.tools:
+            print(tool.name)
+            print(tool.description)
+            print(tool.input_schema)
+
+The server currently advertises five MCP tools:
+
+```text
+search_policy_documents
+get_policy_section
+lookup_employee_profile
+check_pto_balance
+mock_submit_pto_request
+```
+
+Tool discovery returns each tool's name, description, and machine-readable input schema. The schemas are derived from the registered Python tool signatures and type annotations.
+
+### MCP Tool Schemas
+
+#### `search_policy_documents`
+
+Searches the persistent Chroma policy index for semantically relevant policy evidence.
+
+Inputs:
+
+- `query` — required string containing the policy question or search terms
+- `top_k` — optional integer specifying the number of results; defaults to 5 and is limited to 1 through 10
+
+Returns ranked policy chunks containing:
+
+- Rank
+- Chunk ID
+- Retrieved text
+- Document title
+- Source path
+- Section
+- Page or row when available
+- Similarity score
+
+This tool satisfies the requirement for an MCP tool that uses the RAG index.
+
+#### `get_policy_section`
+
+Retrieves policy evidence from a specific indexed policy section using Chroma metadata filtering.
+
+Inputs:
+
+- `section` — required section name
+- `policy_title` — optional policy title used to further restrict retrieval
+- `top_k` — optional result limit; defaults to 5 and is limited to 1 through 10
+
+The tool returns matching policy chunks and citation-related source metadata. If no indexed evidence matches the requested section, it returns a controlled `not_found` response.
+
+#### `lookup_employee_profile`
+
+Looks up one fictional Northstar employee from the structured employee roster.
+
+Inputs:
+
+- `work_email` — optional employee work email
+- `full_name` — optional exact employee full name
+
+At least one employee identifier must be supplied. The tool returns only fields required by supported HR workflows rather than the complete roster record.
+
+This tool uses the fictional structured dataset stored at:
+
+```text
+data/structured/Northstar_Analytics_Employee_Roster.csv
+```
+
+#### `check_pto_balance`
+
+Looks up one fictional employee's PTO balance.
+
+Inputs:
+
+- `employee_id` — optional employee ID
+- `work_email` — optional employee work email
+
+At least one identifier must be supplied. The tool returns fields including annual allowance, accrued PTO, used PTO, pending requests, current balance, available balance after pending requests, and the balance date.
+
+This tool uses:
+
+```text
+data/structured/Northstar_Analytics_PTO_Balances.csv
+```
+
+#### `mock_submit_pto_request`
+
+Previews or simulates a PTO request without modifying a real HR system.
+
+Inputs:
+
+- `employee_id`
+- `start_date`
+- `end_date`
+- `requested_days`
+- `confirmed`
+
+When `confirmed` is false, the tool returns `confirmation_required` with a request preview and performs no action.
+
+When `confirmed` is true and the request passes validation, the tool returns `mock_completed` with a synthetic `MOCK-PTO-*` request ID.
+
+The tool always reports:
+
+```text
+side_effects: none
+```
+
+No real HR system, employee record, or PTO balance is changed.
+
+### Tool Validation and Controlled Results
+
+The MCP tools return structured status values so agent workflows can handle failures and incomplete information without relying on unstructured exception text.
+
+Supported outcomes include:
+
+```text
+ok
+needs_clarification
+invalid_request
+not_found
+unavailable
+confirmation_required
+mock_completed
+tool_error
+tool_unavailable
+```
+
+Examples of validation include:
+
+- Policy search `top_k` must be between 1 and 10.
+- Employee lookup requires a work email or exact full name.
+- PTO lookup requires an employee ID or work email.
+- Unknown policy sections return `not_found`.
+- PTO request dates must be valid ISO dates.
+- PTO request end dates cannot precede start dates.
+- Requested PTO days must be greater than zero.
+- Mock submissions require explicit confirmation.
+
+### Agent Tool Invocation
+
+The agent invokes MCP-exposed tools through `src/mcp_server/client.py`. It does not directly invoke the underlying employee, PTO, or mock-action functions from its workflows.
+
+For example, the PTO workflow calls:
+
+```python
+employee_result = await call_hr_tool(
+    "lookup_employee_profile",
+    {"work_email": work_email},
+)
+```
+
+and:
+
+```python
+pto_result = await call_hr_tool(
+    "check_pto_balance",
+    {"work_email": work_email},
+)
+```
+
+The confirmation-gated PTO action similarly invokes:
+
+```python
+output = await call_hr_tool(
+    "mock_submit_pto_request",
+    arguments,
+)
+```
+
+The resulting execution path is:
+
+```text
+
+Agent workflow
+      |
+      v
+call_hr_tool()
+      |
+      v
+MCP ClientSession
+      |
+      | stdio
+      v
+Northstar MCP Server
+      |
+      v
+Registered MCP tool
+      |
+      v
+Existing retrieval / structured-data / mock-action backend
+```
+
+Operational traces record the selected MCP tool, its arguments, its structured result, and the workflow decision based on that result.
+
+### Policy Retrieval Architecture
+
+Stage 5 exposes policy retrieval through MCP with `search_policy_documents` and `get_policy_section`.
+
+The established Stage 3 grounded-answer pipeline remains available to the Stage 4 agent workflows for full policy answer generation and citation verification. This pipeline retrieves policy evidence, applies the relevance guardrail, generates a grounded answer, resolves source markers, and validates citations.
+
+This means the system supports both:
+
+```text
+MCP policy evidence retrieval
+    -> search_policy_documents
+    -> get_policy_section
+```
+
+and:
+
+```text
+Grounded policy answer generation
+    -> existing RAG pipeline
+    -> citation validation
+```
+
+The employee, PTO, and mock-action capabilities used by the Stage 4 workflows are invoked through MCP.
+
+### Verified MCP Execution
+
+Stage 5 was verified through MCP discovery, direct MCP calls, validation tests, and end-to-end agent execution.
+
+Verified behaviors include:
+
+- Discovery of all five tools with `list_tools()`
+- Semantic policy retrieval from the Chroma index through `search_policy_documents`
+- Metadata-filtered policy retrieval through `get_policy_section`
+- Employee lookup through `lookup_employee_profile`
+- PTO balance lookup through `check_pto_balance`
+- Confirmation-gated mock PTO submission through `mock_submit_pto_request`
+- Controlled handling of invalid, missing, and unknown inputs
+- Agent execution that invokes MCP tools rather than directly calling their backend functions
+
+A successful PTO workflow demonstrated the following sequence:
+
+```text
+intent_routing
+    |
+    v
+lookup_employee_profile       [MCP]
+    |
+    v
+check_pto_balance             [MCP]
+    |
+    v
+policy_retrieval_and_answering
+    |
+    v
+mock_submit_pto_request       [MCP]
+    |
+    v
+response_synthesis
+```
+
+With explicit confirmation, the mock PTO operation returns a synthetic request reference while leaving all HR records unchanged.
+
+### Running the MCP-Integrated Agent
+
+Because the project uses the `src` package from the repository root, the command-line agent can be run with:
+
+```bash
+PYTHONPATH=. python scripts/run_agent.py "What is my PTO balance?" --work-email maya.chen@northstaranalytics.com --show-trace
+```
+
+A confirmation-gated mock PTO request can be demonstrated with:
+
+```bash
+PYTHONPATH=. python scripts/run_agent.py "Request PTO for me" --work-email maya.chen@northstaranalytics.com --employee-id NSA-0001 --start-date 2026-10-15 --end-date 2026-10-16 --requested-days 2 --show-trace
+```
+
+The same request can be explicitly confirmed by adding:
+
+```text
+--confirm
+```
+
+All PTO submission behavior is simulated for demonstration purposes.

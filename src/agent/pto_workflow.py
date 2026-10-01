@@ -98,14 +98,14 @@ async def run_pto_workflow(state: AgentState) -> dict:
     }
 
     employee_result = await call_hr_tool(
-        "lookup_employee",
+        "lookup_employee_profile",
         employee_arguments,
     )
 
     events.append(
         _tool_event(
             step="employee_lookup",
-            tool="lookup_employee",
+            tool="lookup_employee_profile",
             arguments=employee_arguments,
             output=employee_result,
         )
@@ -139,14 +139,14 @@ async def run_pto_workflow(state: AgentState) -> dict:
     }
 
     pto_result = await call_hr_tool(
-        "get_pto_balance",
+        "check_pto_balance",
         balance_arguments,
     )
 
     events.append(
         _tool_event(
             step="pto_balance_lookup",
-            tool="get_pto_balance",
+            tool="check_pto_balance",
             arguments=balance_arguments,
             output=pto_result,
         )
