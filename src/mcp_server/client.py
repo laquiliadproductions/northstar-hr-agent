@@ -82,3 +82,28 @@ async def call_hr_tool(
             "message": "The HR tool service is currently unavailable.",
             "error_type": type(exc).__name__,
         }
+
+async def check_mcp_health() -> dict[str, Any]:
+    """Check whether the Northstar MCP server is reachable."""
+
+    try:
+        async with stdio_client(SERVER_PARAMETERS) as streams:
+            read_stream, write_stream = streams
+
+            async with ClientSession(
+                read_stream,
+                write_stream,
+            ) as session:
+                await session.initialize()
+                tools = await session.list_tools()
+
+        return {
+            "status": "ok",
+            "tool_count": len(tools.tools),
+        }
+
+    except Exception as exc:
+        return {
+            "status": "unavailable",
+            "error_type": type(exc).__name__,
+        }

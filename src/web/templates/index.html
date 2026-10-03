@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Northstar HR Agent</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f6f8;
+            color: #1f2933;
+        }
+
+        .app-shell {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-header {
+            flex: 0 0 auto;
+            background: #16324f;
+            color: #ffffff;
+            padding: 16px 24px;
+            border-bottom: 1px solid #0f253b;
+        }
+
+        .app-header-content {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .app-header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .app-header p {
+            margin: 4px 0 0;
+            color: #d9e6f2;
+            font-size: 0.9rem;
+        }
+
+        .conversation-area {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        #conversation {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .empty-state {
+            margin: auto;
+            max-width: 620px;
+            text-align: center;
+            color: #52606d;
+            padding: 48px 24px;
+        }
+
+        .empty-state h2 {
+            color: #16324f;
+            margin-bottom: 8px;
+        }
+
+        .message {
+            max-width: 88%;
+            padding: 16px 20px;
+            border-radius: 12px;
+            line-height: 1.55;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: #dceaf5;
+            border-bottom-right-radius: 4px;
+        }
+
+        .assistant-message {
+            align-self: flex-start;
+            background: #ffffff;
+            border: 1px solid #d9e2ec;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-role {
+            font-weight: bold;
+            color: #16324f;
+            margin-bottom: 8px;
+        }
+
+        .message-content p {
+            margin: 8px 0;
+        }
+
+        .message-content ul {
+            margin: 8px 0;
+            padding-left: 28px;
+        }
+
+        .message-content li {
+            margin: 4px 0;
+        }
+
+        .source-marker {
+            white-space: nowrap;
+        }
+
+        .message-sources {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #e4e7eb;
+        }
+
+        .message-sources h3 {
+            margin: 0 0 12px;
+            color: #16324f;
+            font-size: 1.05rem;
+        }
+
+        .source-item {
+            background: #f8fafc;
+            border: 1px solid #d9e2ec;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 12px;
+        }
+
+        .source-item p {
+            margin: 5px 0;
+        }
+
+        .source-excerpt {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e4e7eb;
+        }
+
+        .trace-details {
+            margin-top: 16px;
+        }
+
+        .trace-details summary {
+            color: #16324f;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .trace-body {
+            margin-top: 10px;
+            padding: 12px;
+            background: #f8fafc;
+            border: 1px solid #d9e2ec;
+            border-radius: 6px;
+        }
+
+        .trace-item {
+            padding: 4px 0;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .composer {
+            flex: 0 0 auto;
+            background: #ffffff;
+            border-top: 1px solid #d9e2ec;
+            padding: 14px 24px 16px;
+        }
+
+        .composer-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .composer-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        textarea {
+            flex: 1;
+            min-height: 58px;
+            max-height: 160px;
+            resize: vertical;
+            padding: 12px 14px;
+            border: 1px solid #bcccdc;
+            border-radius: 10px;
+            font: inherit;
+            line-height: 1.4;
+        }
+
+        textarea:focus {
+            outline: 2px solid #9fbfd8;
+            border-color: #5f8fb5;
+        }
+
+        button {
+            min-height: 48px;
+            padding: 0 20px;
+            border: 0;
+            border-radius: 9px;
+            background: #16324f;
+            color: #ffffff;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #21486d;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .composer-note {
+            margin: 7px 2px 0;
+            color: #52606d;
+            font-size: 0.85rem;
+        }
+
+        .thinking {
+            color: #52606d;
+            font-style: italic;
+        }
+
+        @media (max-width: 700px) {
+            .conversation-area {
+                padding: 16px 12px;
+            }
+
+            .composer {
+                padding: 12px;
+            }
+
+            .message {
+                max-width: 96%;
+            }
+
+            .composer-row {
+                align-items: stretch;
+            }
+
+            button {
+                padding: 0 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-shell">
+
+        <header class="app-header">
+            <div class="app-header-content">
+                <h1>Northstar HR Agent</h1>
+                <p>
+                    Northstar policy guidance and employee information
+                </p>
+            </div>
+        </header>
+
+        <main
+            class="conversation-area"
+            id="conversation-area"
+        >
+            <div id="conversation">
+                <div
+                    class="empty-state"
+                    id="empty-state"
+                >
+                    <h2>How can Northstar help?</h2>
+                    <p>
+                        Ask an Northstar policy or employee question below.
+                    </p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="composer">
+            <div class="composer-inner">
+
+                <form id="chat-form">
+                    <div class="composer-row">
+
+                        <textarea
+                            id="message"
+                            name="message"
+                            rows="2"
+                            placeholder="Type your message..."
+                            required
+                        ></textarea>
+
+                        <button
+                            type="submit"
+                            id="send-button"
+                        >
+                            Send
+                        </button>
+
+                    </div>
+                </form>
+
+                <p class="composer-note">
+                    Welcome, Northstar employees! Type your policy inquiry
+                    into the chatbot or type "Demo" for a set of demo
+                    questions.
+                </p>
+
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        const form =
+            document.getElementById("chat-form");
+
+        const messageInput =
+            document.getElementById("message");
+
+        const conversationDiv =
+            document.getElementById("conversation");
+
+        const conversationArea =
+            document.getElementById("conversation-area");
+
+        const emptyState =
+            document.getElementById("empty-state");
+
+        const sendButton =
+            document.getElementById("send-button");
+
+        let pendingEmployeeQuestion = null;
+
+        function escapeHtml(text) {
+            return String(text)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+        }
+
+
+        function formatInline(text) {
+            return escapeHtml(text)
+                .replace(
+                    /\s*\[Source\s+(\d+)\]/g,
+                    ' <strong class="source-marker">' +
+                    '[Source $1]</strong>'
+                )
+                .replace(
+                    /\*\*(.+?)\*\*/g,
+                    "<strong>$1</strong>"
+                )
+                .replace(
+                    /\*([^*\n]+?)\*/g,
+                    "<strong>$1</strong>"
+                );
+        }
+
+
+        function formatAnswer(text) {
+            const lines = String(text).split("\n");
+            const output = [];
+
+            let inList = false;
+
+            for (const line of lines) {
+                const trimmed = line.trim();
+
+                if (trimmed === "") {
+                    continue;
+                }
+
+                if (/^[-*]\s+/.test(trimmed)) {
+                    if (!inList) {
+                        output.push("<ul>");
+                        inList = true;
+                    }
+
+                    const itemText =
+                        trimmed.replace(
+                            /^[-*]\s+/,
+                            ""
+                        );
+
+                    output.push(
+                        `<li>${formatInline(itemText)}</li>`
+                    );
+
+                    continue;
+                }
+
+                if (inList) {
+                    output.push("</ul>");
+                    inList = false;
+                }
+
+                output.push(
+                    `<p>${formatInline(trimmed)}</p>`
+                );
+            }
+
+            if (inList) {
+                output.push("</ul>");
+            }
+
+            return output.join("");
+        }
+
+        function formatExcerpt(text) {
+            return escapeHtml(text)
+                .replace(
+                    /&lt;img\b.*?\/?&gt;/gi,
+                    ""
+                )
+                .replace(
+                    /^#{1,6}\s+/g,
+                    ""
+                )
+                .replace(
+                    /\s+#{1,6}\s+/g,
+                    " "
+                )
+                .replace(
+                    /\*{1,2}/g,
+                    ""
+                )
+                .replace(
+                    /\|/g,
+                    " "
+                )
+                .replace(
+                    /-{3,}/g,
+                    " "
+                )
+                .replace(
+                    /\s+[-•]\s+/g,
+                    " "
+                )
+                .replace(
+                    /\s+/g,
+                    " "
+                )
+                .trim();
+        }
+
+        function scrollConversationToBottom() {
+            conversationArea.scrollTo({
+                top: conversationArea.scrollHeight,
+                behavior: "smooth"
+            });
+        }
+
+
+        function removeEmptyState() {
+            if (emptyState) {
+                emptyState.remove();
+            }
+        }
+
+
+        function appendUserMessage(message) {
+            removeEmptyState();
+
+            const wrapper =
+                document.createElement("div");
+
+            wrapper.className =
+                "message user-message";
+
+            const role =
+                document.createElement("div");
+
+            role.className = "message-role";
+            role.textContent = "You";
+
+            const content =
+                document.createElement("div");
+
+            content.className = "message-content";
+            content.textContent = message;
+
+            wrapper.appendChild(role);
+            wrapper.appendChild(content);
+
+            conversationDiv.appendChild(wrapper);
+
+            scrollConversationToBottom();
+        }
+
+
+        function appendThinkingMessage() {
+            const wrapper =
+                document.createElement("div");
+
+            wrapper.className =
+                "message assistant-message thinking";
+
+            wrapper.id = "thinking-message";
+
+            wrapper.textContent =
+                "Northstar is thinking...";
+
+            conversationDiv.appendChild(wrapper);
+
+            scrollConversationToBottom();
+        }
+
+
+        function removeThinkingMessage() {
+            const thinking =
+                document.getElementById(
+                    "thinking-message"
+                );
+
+            if (thinking) {
+                thinking.remove();
+            }
+        }
+
+
+        function appendAssistantMessage(data) {
+            removeThinkingMessage();
+
+            const wrapper =
+                document.createElement("div");
+
+            wrapper.className =
+                "message assistant-message";
+
+            const role =
+                document.createElement("div");
+
+            role.className = "message-role";
+            role.textContent = "Northstar";
+
+            const content =
+                document.createElement("div");
+
+            content.className = "message-content";
+            content.innerHTML =
+                formatAnswer(data.answer || "");
+
+            wrapper.appendChild(role);
+            wrapper.appendChild(content);
+
+
+            if (
+                data.citations &&
+                data.citations.length > 0
+            ) {
+                const sourcesSection =
+                    document.createElement("div");
+
+                sourcesSection.className =
+                    "message-sources";
+
+                const heading =
+                    document.createElement("h3");
+
+                heading.textContent =
+                    "Sources & Supporting Evidence";
+
+                sourcesSection.appendChild(heading);
+
+
+                for (
+                    const citation
+                    of data.citations
+                ) {
+                    const item =
+                        document.createElement("div");
+
+                    item.className = "source-item";
+
+
+                    const pageText =
+                        citation.page !== null &&
+                        citation.page !== undefined
+                            ? citation.page
+                            : "n/a";
+
+
+                    const matchingSnippet =
+                        (data.snippets || []).find(
+                            (source) =>
+                                source.marker ===
+                                citation.marker
+                        );
+
+
+                    const excerpt =
+                        matchingSnippet
+                            ? formatExcerpt(
+                                matchingSnippet.snippet
+                            )
+                            : "No supporting excerpt returned.";
+
+
+                    item.innerHTML = `
+                        <p>
+                            <strong>
+                                ${escapeHtml(
+                                    citation.marker
+                                )}
+                            </strong>
+                        </p>
+
+                        <p>
+                            <strong>Title:</strong>
+                            ${escapeHtml(
+                                citation.title
+                            )}
+                        </p>
+
+                        <p>
+                            <strong>Section:</strong>
+                            ${escapeHtml(
+                                citation.section
+                            )}
+                        </p>
+
+                        <p>
+                            <strong>Page:</strong>
+                            ${escapeHtml(
+                                pageText
+                            )}
+                        </p>
+
+                        <div class="source-excerpt">
+                            <strong>Excerpt:</strong>
+                            <p>${excerpt}</p>
+                        </div>
+                    `;
+
+                    sourcesSection.appendChild(item);
+                }
+
+
+                wrapper.appendChild(
+                    sourcesSection
+                );
+            }
+
+
+            if (
+                data.trace &&
+                data.trace.length > 0
+            ) {
+                const details =
+                    document.createElement("details");
+
+                details.className =
+                    "trace-details";
+
+                const summary =
+                    document.createElement("summary");
+
+                summary.textContent =
+                    "Agent Trace";
+
+                const traceBody =
+                    document.createElement("div");
+
+                traceBody.className =
+                    "trace-body";
+
+
+                for (const event of data.trace) {
+                    const item =
+                        document.createElement("div");
+
+                    item.className =
+                        "trace-item";
+
+
+                    const toolText =
+                        event.selected_tool
+                            ? ` | Tool: ${event.selected_tool}`
+                            : "";
+
+
+                    item.textContent =
+                        `${event.step} | Status: ` +
+                        `${event.status}${toolText}`;
+
+
+                    traceBody.appendChild(item);
+                }
+
+
+                details.appendChild(summary);
+                details.appendChild(traceBody);
+
+                wrapper.appendChild(details);
+            }
+
+
+            conversationDiv.appendChild(wrapper);
+
+            scrollConversationToBottom();
+        }
+
+        function appendDemoQuestions() {
+            appendAssistantMessage({
+                answer:
+                    "**Demo Questions**\n\n" +
+                    "- Policy: What does Northstar's " +
+                    "anti-harassment policy prohibit?\n" +
+                    "- PTO: How much PTO do I have available? " +
+                    "My email is " +
+                    "maya.chen@northstaranalytics.com\n" +
+                    "- Remote Work: Am I eligible for remote work? " +
+                    "My email is " +
+                    "maya.chen@northstaranalytics.com",
+                citations: [],
+                snippets: [],
+                trace: []
+            });
+        }
+
+        function extractEmail(message) {
+            const match = message.match(
+                /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i
+            );
+
+            return match ? match[0] : null;
+        }
+
+        function needsEmployeeIdentity(data) {
+            const answer =
+                String(data.answer || "").toLowerCase();
+
+            return (
+                data.intent === "pto_guidance" ||
+                data.intent === "remote_work_eligibility"
+            ) &&
+            (
+                answer.includes(
+                    "provide the employee's work email"
+                ) ||
+                answer.includes(
+                    "provide the employee’s work email"
+                ) ||
+                answer.includes(
+                    "exact full name"
+                )
+            );
+        }
+
+        async function sendMessage(message) {
+            appendUserMessage(message);
+
+            appendThinkingMessage();
+
+            sendButton.disabled = true;
+
+
+            try {
+                const extractedEmail =
+                    extractEmail(message);
+
+                const requestMessage =
+                    pendingEmployeeQuestion &&
+                    extractedEmail
+                        ? pendingEmployeeQuestion
+                        : message;
+
+                const response =
+                    await fetch("chat", {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            message: requestMessage,
+                            work_email: extractedEmail
+                        })
+                    });
+
+                const data =
+                    await response.json();
+
+
+                if (!response.ok) {
+                    appendAssistantMessage({
+                        answer:
+                            data.error ||
+                            "The request failed.",
+                        citations: [],
+                        snippets: [],
+                        trace: []
+                    });
+
+                    return;
+                }
+
+                if (needsEmployeeIdentity(data)) {
+                    pendingEmployeeQuestion =
+                        requestMessage;
+                } else {
+                    pendingEmployeeQuestion = null;
+                }
+
+                appendAssistantMessage(data);
+
+            } catch (error) {
+                console.error(
+                    "Northstar chat request failed:",
+                    error
+                );
+
+                appendAssistantMessage({
+                    answer:
+                        "Unable to reach the " +
+                        "Northstar HR Agent.",
+                    citations: [],
+                    snippets: [],
+                    trace: []
+                });
+
+            } finally {
+                sendButton.disabled = false;
+
+                messageInput.focus();
+            }
+        }
+
+
+        form.addEventListener(
+            "submit",
+            async (event) => {
+                event.preventDefault();
+
+                const message =
+                    messageInput.value.trim();
+
+                if (!message) {
+                    return;
+                }
+
+                messageInput.value = "";
+
+                if (
+                    message.toLowerCase() === "demo"
+                ) {
+                    appendUserMessage(message);
+
+                    appendDemoQuestions();
+
+                    return;
+                }
+
+                await sendMessage(message);
+            }
+        );
+
+        messageInput.addEventListener(
+            "keydown",
+            (event) => {
+                if (
+                    event.key === "Enter" &&
+                    !event.shiftKey
+                ) {
+                    event.preventDefault();
+
+                    form.requestSubmit();
+                }
+            }
+        );
+    </script>
+</body>
+</html>

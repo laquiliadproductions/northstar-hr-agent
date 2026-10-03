@@ -938,3 +938,131 @@ The same request can be explicitly confirmed by adding:
 ```
 
 All PTO submission behavior is simulated for demonstration purposes.
+
+## Stage 6 - Web Application
+
+The Northstar HR Agent is available through a public Flask web application behind Nginx.
+
+### Public URL
+
+http://54.245.188.227/northstar/
+
+### Endpoints
+
+- `GET /northstar/`
+  - Opens the Northstar HR chatbot interface.
+
+- `POST /northstar/chat`
+  - Accepts HR policy and workflow requests.
+  - Returns:
+    - final answer
+    - citations
+    - supporting snippets
+    - concise agent trace
+    - intent
+    - confirmation and escalation status
+
+- `GET /northstar/health`
+  - Returns application status and MCP connectivity status.
+
+Example health response:
+
+```json
+{
+  "app": "northstar-hr-agent",
+  "mcp": {
+    "status": "ok",
+    "tool_count": 5
+  },
+  "status": "ok"
+}
+```
+### Demo Instructions
+
+Open the public chatbot and type:
+
+```text
+Demo
+```
+
+The chatbot will display reproducible example queries.
+
+#### Demo 1 - PTO Workflow
+
+```text
+How much PTO do I have available? My email is maya.chen@northstaranalytics.com
+```
+
+This demo exercises:
+
+1. Intent routing
+2. MCP employee lookup
+3. MCP PTO balance lookup
+4. PTO policy RAG retrieval
+5. Grounded response synthesis
+
+#### Demo 2 - Remote Work Eligibility
+
+```text
+Am I eligible for remote work? My email is maya.chen@northstaranalytics.com
+```
+
+This demo exercises:
+
+1. Intent routing
+2. MCP employee lookup
+3. Remote-work policy RAG retrieval
+4. Preliminary eligibility guidance
+5. Grounded response synthesis
+
+### Conversational Employee Identification
+
+Employee-specific requests can also be completed as a multi-turn conversation.
+
+Example:
+
+```text
+User:
+How much PTO do I have?
+
+Northstar:
+Provide the employee's work email or exact full name.
+
+User:
+maya.chen@northstaranalytics.com
+```
+
+When the employee provides the requested email, the chatbot preserves the pending request and resumes the original workflow using the supplied employee identity.
+
+An employee email may also be included directly in the original request:
+
+```text
+How much PTO do I have available? My email is maya.chen@northstaranalytics.com
+```
+
+### Agent Transparency
+
+Grounded policy responses display:
+
+- The final HR response
+- Cited policy sources
+- Supporting policy excerpts
+- A collapsible concise agent trace
+
+The agent trace allows the grader to inspect the major routing, retrieval, and tool-use steps without exposing internal reasoning.
+
+### Testing
+
+Run the complete automated test suite from the project root:
+
+```bash
+python -m pytest -q
+```
+
+Current Stage 6 validation result:
+
+```text
+36 passed
+```
+
+
