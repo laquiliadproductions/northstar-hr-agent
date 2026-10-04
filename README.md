@@ -1064,5 +1064,92 @@ Current Stage 6 validation result:
 ```text
 36 passed
 ```
+## Stage 7 - Render Deployment
 
+The Northstar HR Agent is configured for a zero-cost, single-service deployment on Render.
 
+### Deployment Architecture
+
+The Render web service runs the complete application:
+
+- Flask web interface and HTTP endpoints
+- Gunicorn production web server
+- LangGraph agent orchestrator
+- Local stdio MCP server process
+- Chroma policy vector store
+- Committed fictional policy and structured HR data
+
+The MCP server remains behind the application boundary and is started locally through the stdio client. No separate MCP hosting service or paid database is required.
+
+### Render Configuration
+
+Deployment is defined in `render.yaml`.
+
+```text
+Runtime: Python 3.12
+Plan: Free
+Health check: /health
+```
+
+Build command:
+
+```bash
+pip install -r requirements.txt && python scripts/build_policy_index.py
+```
+
+Start command:
+
+```bash
+gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120 src.web.app:app
+```
+
+The build command installs the pinned dependencies and rebuilds the local Chroma index from the committed policy documents. The validated index contains 267 chunks across fourteen policy files.
+
+### Environment Variables
+
+The Render service requires:
+
+| Variable | Purpose |
+|---|---|
+| `LLM_PROVIDER` | Provider label; currently `groq` |
+| `LLM_API_KEY` | Private Groq API credential |
+| `LLM_BASE_URL` | OpenAI-compatible Groq endpoint |
+| `LLM_MODEL` | Deployed model identifier |
+| `PYTHONHASHSEED` | Reproducible Python hashing seed |
+
+`LLM_API_KEY` is entered as a private Render environment variable and is never committed to Git.
+
+### Storage
+
+The application does not require a paid database or persistent disk.
+
+- Fictional policy documents and structured CSV data are committed to the repository.
+- The `chroma_db/` directory is generated during each Render build.
+- Runtime filesystem changes are treated as ephemeral.
+- Mock PTO submissions do not modify persistent HR records.
+
+### Public Render URL
+
+The public Render URL will be added here after the initial deployment succeeds.
+
+### Free-Tier Cold Starts
+
+Render free web services spin down after periods of inactivity. The first request after a spin-down can take a minute or longer while the service starts. During a cold start, the browser may appear to wait before the chatbot loads.
+
+If this occurs:
+
+1. Wait for the initial request to complete.
+2. Refresh the page if necessary.
+3. Submit the demo request after the interface loads.
+
+Requests made while the service remains active should respond more quickly. Cold-start delay is expected free-tier behavior and does not indicate that the application is unavailable.
+
+### Deployment Validation
+
+After each deployment:
+
+1. Open the public application URL.
+2. Confirm that `/health` returns HTTP 200 with application and MCP status.
+3. Submit a general policy question and verify grounded citations.
+4. Submit an employee-specific PTO question and verify MCP tool use.
+5. Confirm that no real HR data or production system is modified.
