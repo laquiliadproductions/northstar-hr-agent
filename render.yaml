@@ -5,7 +5,7 @@ services:
     plan: free
     buildCommand: pip install -r requirements.txt && python scripts/build_policy_index.py
     startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120 src.web.app:app
-    healthCheckPath: /health
+    healthCheckPath: /ready
     envVars:
       - key: LLM_PROVIDER
         value: groq

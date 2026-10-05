@@ -1088,7 +1088,7 @@ Deployment is defined in `render.yaml`.
 ```text
 Runtime: Python 3.12
 Plan: Free
-Health check: /health
+Health check: /ready
 ```
 
 Build command:
@@ -1149,7 +1149,8 @@ Requests made while the service remains active should respond more quickly. Cold
 After each deployment:
 
 1. Open the public application URL.
-2. Confirm that `/health` returns HTTP 200 with application and MCP status.
-3. Submit a general policy question and verify grounded citations.
-4. Submit an employee-specific PTO question and verify MCP tool use.
-5. Confirm that no real HR data or production system is modified.
+2. Confirm that `/ready` returns HTTP 200.
+3. Confirm that `/health` reports application and MCP status.
+4. Submit a general policy question and verify grounded citations.
+5. Submit an employee-specific PTO question and verify MCP tool use.
+6. Confirm that no real HR data or production system is modified.

@@ -16,6 +16,15 @@ def home():
 
     return render_template("index.html")
 
+@app.get("/ready")
+def ready():
+    """Return lightweight application readiness status."""
+
+    return {
+        "status": "ok",
+        "app": "northstar-hr-agent",
+    }
+
 @app.get("/health")
 def health():
     """Return application and MCP connectivity status."""
