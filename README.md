@@ -9,10 +9,11 @@ The project currently implements corpus preparation, document ingestion, local e
 | Stage 1: Data and policy corpus | Complete | Fourteen policy documents and two fictional structured datasets |
 | Stage 2: Ingestion and indexing | Complete | Loading, cleaning, chunking, local embeddings, Chroma persistence, and citation metadata |
 | Stage 3: Retrieval-Augmented Generation | Complete | Top-k retrieval, metadata filtering, grounded prompts, verified citations, guardrails, tests, and a complex multi-document case |
-| User interface | Planned | Streamlit application |
 | Stage 4: Agentic system design | Complete | LangGraph orchestration, multi-step HR workflows, operational traces, graceful failures, policy-aware reasoning, and confirmation-gated mock actions |
-| Full evaluation framework | Planned | Retrieval and generation metrics beyond the current automated tests |
 | Stage 5: MCP server and tool integration | Complete | Local stdio MCP server, five discoverable tools, RAG-backed policy retrieval, structured HR data access, confirmation-gated mock operations, and agent-to-MCP execution |
+| Stage 6: Web application | Complete | Flask chatbot, HTTP endpoints, citations, supporting snippets, agent traces, and conversational employee identification |
+| Stage 7: Render deployment | Complete | Free single-service deployment, generated Chroma index, public URL, readiness checks, and cold-start documentation |
+| Full evaluation framework | Planned | Retrieval and generation metrics beyond the current automated tests |
 
 ## Implemented Capabilities
 
@@ -529,7 +530,7 @@ Run all automated tests:
 pytest -q
 ```
 
-The current suite contains 32 tests covering:
+The current suite contains 37 tests covering:
 
 - Ranked retrieval conversion
 - Metadata-filter forwarding
@@ -583,15 +584,15 @@ The test suite does not require a live language-model call.
 - Dense retrieval may rank passages with related terminology even when they do not answer the question.
 - Complex questions may require a larger top-k value or future query decomposition.
 - Free-tier model availability and rate limits may change.
-- The current project has no Streamlit interface.
+- Free-tier CPU and memory constraints can make policy and multi-step agent responses slow.
 - HR actions are intentionally mock-only and do not integrate with a production HR system.
 - A larger formal evaluation dataset is still needed.
 
-## Planned Next Stages
+## Future Enhancements
 
-- Streamlit user interface
 - Expanded retrieval and generation evaluation
-- Deployment to a suitable free-tier environment
+- Free-tier performance profiling and optimization
+- Optional separate HTTP deployment for the MCP server
 
 ## Stage 5: MCP Server and Tool Integration
 ### Architecture
@@ -1059,10 +1060,10 @@ Run the complete automated test suite from the project root:
 python -m pytest -q
 ```
 
-Current Stage 6 validation result:
+Current full-suite validation result:
 
 ```text
-36 passed
+37 passed
 ```
 ## Stage 7 - Render Deployment
 
@@ -1130,11 +1131,14 @@ The application does not require a paid database or persistent disk.
 
 ### Public Render URL
 
-The public Render URL will be added here after the initial deployment succeeds.
+[https://northstar-hr-agent-5uub.onrender.com](https://northstar-hr-agent-5uub.onrender.com)
+
+Deployment status: Live and validated with the readiness endpoint, MCP health check, policy RAG query, and employee-specific PTO workflow.
 
 ### Free-Tier Cold Starts
 
 Render free web services spin down after periods of inactivity. The first request after a spin-down can take a minute or longer while the service starts. During a cold start, the browser may appear to wait before the chatbot loads.
+Even while the service is active, policy retrieval and multi-step agent workflows may respond slowly because the free instance has limited CPU and memory and the application performs local embedding, vector retrieval, MCP subprocess, and external model operations. Performance optimization is deferred and tracked as a known limitation.
 
 If this occurs:
 
