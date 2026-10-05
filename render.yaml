@@ -3,6 +3,7 @@ services:
     name: northstar-hr-agent
     runtime: python
     plan: free
+    autoDeployTrigger: checksPass
     buildCommand: pip install -r requirements.txt && python scripts/build_policy_index.py
     startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120 src.web.app:app
     healthCheckPath: /ready
