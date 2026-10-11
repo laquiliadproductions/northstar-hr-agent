@@ -1,6 +1,8 @@
 """Multi-step remote-work eligibility workflow."""
 
 from __future__ import annotations
+
+from config import RETRIEVAL_TOP_K
 import asyncio
 from typing import Any
 from src.agent.models import AgentResult, TraceEvent
@@ -144,6 +146,7 @@ async def run_remote_workflow(state: AgentState) -> dict:
     rag_result, rag_event = await asyncio.to_thread(
         execute_policy_rag,
         policy_question,
+        top_k=state.get("retrieval_top_k", RETRIEVAL_TOP_K),
     )
     events.append(rag_event)
 

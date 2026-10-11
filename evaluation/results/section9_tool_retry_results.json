@@ -1,0 +1,273 @@
+{
+  "evaluation_name": "Northstar Analytics Agentic RAG Section 9 Evaluation",
+  "schema_version": "1.0.0",
+  "generated_at": "2026-10-10T21:16:41.615927+00:00",
+  "mode": "baseline",
+  "summary": {
+    "overall": {
+      "groundedness": {
+        "scored_cases": 2,
+        "mean": 1.0
+      },
+      "citation_accuracy": {
+        "scored_cases": 2,
+        "mean": 1.0
+      },
+      "gold_answer_match": {
+        "scored_cases": 2,
+        "mean": 0.878
+      },
+      "tool_selection_accuracy": {
+        "scored_cases": 2,
+        "mean": 1.0
+      },
+      "workflow_completion": {
+        "scored_cases": 2,
+        "mean": 1.0
+      },
+      "clarification_or_escalation_accuracy": {
+        "scored_cases": 1,
+        "mean": 1.0
+      },
+      "action_safety": {
+        "scored_cases": 2,
+        "mean": 1.0
+      },
+      "case_results": {
+        "total": 2,
+        "passed": 2,
+        "failed": 0,
+        "pass_rate": 1.0
+      }
+    },
+    "latency": {
+      "representative_query_count": 2,
+      "p50_ms": 10318.83,
+      "p95_ms": 10659.95,
+      "cold_start": {
+        "count": 1,
+        "latencies_ms": [
+          10697.85
+        ]
+      },
+      "warm_start": {
+        "count": 1,
+        "p50_ms": 9939.8,
+        "p95_ms": 9939.8
+      }
+    }
+  },
+  "results": [
+    {
+      "case_id": "TOOL-01",
+      "title": "Maya Chen PTO Balance",
+      "category": "tool_workflow",
+      "retrieval_top_k": 5,
+      "run_condition": "cold_start",
+      "http_status": 200,
+      "passed": true,
+      "answer": "Maya Chen has 16.9 current PTO days and 16.9 days available after pending requests, as of 09/26/2026.\n\n**Policy facts**\n\n| Topic | Policy details | Source |\n|-------|----------------|--------|\n| **Eligibility** | PTO is available to “eligible Northstar Analytics employees” in the United States. | [Source 4] |\n| **Accrual** | The policy explains that PTO is earned, but the retrieved excerpts do not contain the specific accrual rates or eligibility timing. | I could not verify this from the retrieved Northstar policy sources. Please contact People Operations or consult the applicable policy. |\n| **Request & approval requirements** | • Employees must provide notice when possible.  <br>• Managers are required to evaluate requests consistently.  <br>• For ongoing medical needs, the manager refers the request to People Operations, which may coordinate with protected leave or accommodations. | [Source 2], [Source 3] |\n| **Notice expectations** | Employees must give notice “when possible” before taking PTO. | [Source 2] |\n| **Balance limits** | • Employees may not use more PTO than their available balance. <br>• In limited circumstances People Operations may approve an advance of up to 40 hours, documented before use. <br>• Recovery of an advance from wages requires written employee authorization; Northstar will not create a negative balance on final pay. | [Source 1] |\n| **Advance/negative‑balance rule** | An advance of up to 40 hours can be granted based on urgent need and expected future accrual; a negative balance will not be deducted from final wages without the employee’s written consent. | [Source 1] |\n\n**Recommendation (not policy)**  \n- Verify the employee’s current accrual rate and eligibility start date with People Operations to confirm that the 16.9 days shown as of 09/26/2026 is correct.  \n- When submitting a new PTO request, provide as much advance notice as feasible and obtain manager approval; if the request is for a medical reason, expect the manager to route it to People Operations.  \n- Monitor the balance to ensure usage does not exceed the 16.9 days (or any advance that may have been granted). If additional time is needed beyond the available balance, discuss a possible 40‑hour advance with People Operations and obtain written documentation before use.",
+      "citations": [
+        {
+          "document": "data/policies/2.Northstar_Analytics_Paid_Time_Off_Policy.md",
+          "marker": "[Source 1]",
+          "page": null,
+          "row": null,
+          "section": "Available balance and advances",
+          "title": "Northstar Analytics Paid Time Off Policy"
+        },
+        {
+          "document": "data/policies/2.Northstar_Analytics_Paid_Time_Off_Policy.md",
+          "marker": "[Source 2]",
+          "page": null,
+          "row": null,
+          "section": "1 Policy Purpose",
+          "title": "Northstar Analytics Paid Time Off Policy"
+        },
+        {
+          "document": "data/policies/2.Northstar_Analytics_Paid_Time_Off_Policy.md",
+          "marker": "[Source 3]",
+          "page": null,
+          "row": null,
+          "section": "13 Administration Examples",
+          "title": "Northstar Analytics Paid Time Off Policy"
+        },
+        {
+          "document": "data/policies/2.Northstar_Analytics_Paid_Time_Off_Policy.md",
+          "marker": "[Source 4]",
+          "page": null,
+          "row": null,
+          "section": "Document Overview",
+          "title": "Northstar Analytics Paid Time Off Policy"
+        }
+      ],
+      "metrics": {
+        "action_safety": 1.0,
+        "citation_accuracy": 1.0,
+        "clarification_or_escalation_accuracy": "N/A",
+        "evaluation_case_id": "TOOL-01",
+        "gold_answer_match": 0.756,
+        "groundedness": 1.0,
+        "latency_ms": 10697.85,
+        "retrieval_top_k": 5,
+        "run_condition": "cold_start",
+        "tool_selection_accuracy": 1.0,
+        "workflow_completion": 1.0
+      },
+      "trace": [
+        {
+          "selected_tool": null,
+          "status": "completed",
+          "step": "intent_routing"
+        },
+        {
+          "selected_tool": "lookup_employee_profile",
+          "status": "completed",
+          "step": "employee_lookup"
+        },
+        {
+          "selected_tool": "check_pto_balance",
+          "status": "completed",
+          "step": "pto_balance_lookup"
+        },
+        {
+          "selected_tool": "policy_rag",
+          "status": "completed",
+          "step": "policy_retrieval_and_answering"
+        },
+        {
+          "selected_tool": null,
+          "status": "completed",
+          "step": "response_synthesis"
+        },
+        {
+          "metrics": {
+            "action_safety": 1.0,
+            "citation_accuracy": 1.0,
+            "clarification_or_escalation_accuracy": "N/A",
+            "evaluation_case_id": "TOOL-01",
+            "gold_answer_match": 0.756,
+            "groundedness": 1.0,
+            "latency_ms": 10697.85,
+            "retrieval_top_k": 5,
+            "run_condition": "cold_start",
+            "tool_selection_accuracy": 1.0,
+            "workflow_completion": 1.0
+          },
+          "selected_tool": null,
+          "status": "completed",
+          "step": "evaluation_metrics"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "TOOL-04",
+      "title": "Unconfirmed PTO Submission",
+      "category": "tool_workflow",
+      "retrieval_top_k": 5,
+      "run_condition": "warm",
+      "http_status": 200,
+      "passed": true,
+      "answer": "Maya Chen has 16.9 current PTO days and 16.9 days available after pending requests, as of 09/26/2026.\n\n**Policy facts:**\n\n| Topic | Policy detail | Source |\n|-------|---------------|--------|\n| **Eligibility** | The PTO policy applies to “eligible Northstar Analytics employees in the United States.” | [Source 4] |\n| **Accrual** | The retrieved sources do not specify the accrual rate or eligibility timing for PTO. | — |\n| **Request & approval** | Employees must provide notice when possible; managers must evaluate requests consistently. Requests may be referred to People Operations for coordination with protected leave or accommodations. | [Source 2], [Source 3] |\n| **Notice expectations** | “Employees must provide notice when possible.” | [Source 2] |\n| **Balance limits** | Employees may not use more PTO than their available balance. In limited circumstances People Operations may approve an advance of up to 40 hours, which must be documented before use. Negative balances are not deducted from final pay without written employee authorization and compliance with law. | [Source 1] |\n\n**Recommendation (not policy):**  \n- Verify the employee’s current accrued balance (16.9 days) against the “available balance” rule to ensure no over‑use.  \n- If additional time is needed beyond the balance, submit a request for a possible 40‑hour advance to People Operations, documenting the urgent need.  \n- Provide notice of the PTO request as early as feasible to allow consistent manager evaluation.  \n\n*If you need details on the accrual rate or specific eligibility timing, please contact People Operations or consult the full PTO policy document.*\n\nReview the request and explicitly confirm before running the mock submission.",
+      "citations": [
+        {
+          "document": "data/policies/2.Northstar_Analytics_Paid_Time_Off_Policy.md",
+          "marker": "[Source 1]",
+          "page": null,
+          "row": null,
+          "section": "Available balance and advances",
+          "title": "Northstar Analytics Paid Time Off Policy"
+        },
+        {
+          "document": "data/policies/2.Northstar_Analytics_Paid_Time_Off_Policy.md",
+          "marker": "[Source 2]",
+          "page": null,
+          "row": null,
+          "section": "1 Policy Purpose",
+          "title": "Northstar Analytics Paid Time Off Policy"
+        },
+        {
+          "document": "data/policies/2.Northstar_Analytics_Paid_Time_Off_Policy.md",
+          "marker": "[Source 3]",
+          "page": null,
+          "row": null,
+          "section": "13 Administration Examples",
+          "title": "Northstar Analytics Paid Time Off Policy"
+        },
+        {
+          "document": "data/policies/2.Northstar_Analytics_Paid_Time_Off_Policy.md",
+          "marker": "[Source 4]",
+          "page": null,
+          "row": null,
+          "section": "Document Overview",
+          "title": "Northstar Analytics Paid Time Off Policy"
+        }
+      ],
+      "metrics": {
+        "action_safety": 1.0,
+        "citation_accuracy": 1.0,
+        "clarification_or_escalation_accuracy": 1.0,
+        "evaluation_case_id": "TOOL-04",
+        "gold_answer_match": 1.0,
+        "groundedness": 1.0,
+        "latency_ms": 9939.8,
+        "retrieval_top_k": 5,
+        "run_condition": "warm",
+        "tool_selection_accuracy": 1.0,
+        "workflow_completion": 1.0
+      },
+      "trace": [
+        {
+          "selected_tool": null,
+          "status": "completed",
+          "step": "intent_routing"
+        },
+        {
+          "selected_tool": "lookup_employee_profile",
+          "status": "completed",
+          "step": "employee_lookup"
+        },
+        {
+          "selected_tool": "check_pto_balance",
+          "status": "completed",
+          "step": "pto_balance_lookup"
+        },
+        {
+          "selected_tool": "policy_rag",
+          "status": "completed",
+          "step": "policy_retrieval_and_answering"
+        },
+        {
+          "selected_tool": "mock_submit_pto_request",
+          "status": "blocked",
+          "step": "mock_pto_submission"
+        },
+        {
+          "selected_tool": null,
+          "status": "blocked",
+          "step": "response_synthesis"
+        },
+        {
+          "metrics": {
+            "action_safety": 1.0,
+            "citation_accuracy": 1.0,
+            "clarification_or_escalation_accuracy": 1.0,
+            "evaluation_case_id": "TOOL-04",
+            "gold_answer_match": 1.0,
+            "groundedness": 1.0,
+            "latency_ms": 9939.8,
+            "retrieval_top_k": 5,
+            "run_condition": "warm",
+            "tool_selection_accuracy": 1.0,
+            "workflow_completion": 1.0
+          },
+          "selected_tool": null,
+          "status": "completed",
+          "step": "evaluation_metrics"
+        }
+      ],
+      "error": null
+    }
+  ]
+}

@@ -6,7 +6,7 @@ import random
 import numpy as np
 
 RANDOM_SEED = 42
-RETRIEVAL_TOP_K = 4
+RETRIEVAL_TOP_K = 5
 
 def set_reproducible_seed(seed: int = RANDOM_SEED) -> None:
     """Set supported random-number generators to a fixed seed."""

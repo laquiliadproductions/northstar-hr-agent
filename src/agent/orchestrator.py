@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from langgraph.graph import END, START, StateGraph
 
+from config import RETRIEVAL_TOP_K
+
 
 
 from src.agent.models import AgentIntent, AgentResult
@@ -161,6 +163,7 @@ async def run_agent(
     requested_days: float | None = None,
 
     confirmed: bool = False,
+    retrieval_top_k: int = RETRIEVAL_TOP_K,
 
 ) -> AgentResult:
 
@@ -185,6 +188,7 @@ async def run_agent(
         "requested_days": requested_days,
 
         "confirmed": confirmed,
+        "retrieval_top_k": retrieval_top_k,
 
         "trace": [],
 

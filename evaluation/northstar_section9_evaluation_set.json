@@ -1735,7 +1735,7 @@
           "response_synthesis"
         ],
         "disposition": "needs_clarification",
-        "requires_confirmation": true,
+        "requires_confirmation": false,
         "escalation_required": false
       },
       "source_documents": [

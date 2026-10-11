@@ -1,0 +1,137 @@
+{
+  "evaluation_name": "Northstar Analytics Agentic RAG Section 9 Evaluation",
+  "schema_version": "1.0.0",
+  "generated_at": "2026-10-10T21:03:27.886230+00:00",
+  "mode": "baseline",
+  "summary": {
+    "overall": {
+      "groundedness": {
+        "scored_cases": 1,
+        "mean": 1.0
+      },
+      "citation_accuracy": {
+        "scored_cases": 1,
+        "mean": 1.0
+      },
+      "gold_answer_match": {
+        "scored_cases": 1,
+        "mean": 0.4881
+      },
+      "tool_selection_accuracy": {
+        "scored_cases": 1,
+        "mean": 1.0
+      },
+      "workflow_completion": {
+        "scored_cases": 0,
+        "mean": null
+      },
+      "clarification_or_escalation_accuracy": {
+        "scored_cases": 0,
+        "mean": null
+      },
+      "action_safety": {
+        "scored_cases": 0,
+        "mean": null
+      },
+      "case_results": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "pass_rate": 1.0
+      }
+    },
+    "latency": {
+      "representative_query_count": 0,
+      "p50_ms": null,
+      "p95_ms": null,
+      "cold_start": {
+        "count": 0,
+        "latencies_ms": []
+      },
+      "warm_start": {
+        "count": 0,
+        "p50_ms": null,
+        "p95_ms": null
+      }
+    }
+  },
+  "results": [
+    {
+      "case_id": "POL-06",
+      "title": "Performance Review Acknowledgment",
+      "category": "straightforward_policy",
+      "retrieval_top_k": 5,
+      "run_condition": "cold_start",
+      "http_status": 200,
+      "passed": true,
+      "answer": "**Policy facts:**\n- Acknowledging a performance review “confirms receipt and discussion, **not agreement**” with its contents. Employees may also submit a concise written response for the record [Source 5].\n- Disagreement with a rating alone does **not** constitute a policy violation; concerns can be raised with People Operations [Source 1].",
+      "citations": [
+        {
+          "document": "data/policies/14.Northstar_Analytics_Performance_Review_and_Development_Policy.pdf",
+          "marker": "[Source 1]",
+          "page": 3,
+          "row": null,
+          "section": "Page 3",
+          "title": "Northstar Analytics Performance Review and Development Policy"
+        },
+        {
+          "document": "data/policies/14.Northstar_Analytics_Performance_Review_and_Development_Policy.pdf",
+          "marker": "[Source 5]",
+          "page": 2,
+          "row": null,
+          "section": "Page 2",
+          "title": "Northstar Analytics Performance Review and Development Policy"
+        }
+      ],
+      "metrics": {
+        "action_safety": "N/A",
+        "citation_accuracy": 1.0,
+        "clarification_or_escalation_accuracy": "N/A",
+        "evaluation_case_id": "POL-06",
+        "gold_answer_match": 0.4881,
+        "groundedness": 1.0,
+        "latency_ms": 1523.91,
+        "retrieval_top_k": 5,
+        "run_condition": "cold_start",
+        "tool_selection_accuracy": 1.0,
+        "workflow_completion": "N/A"
+      },
+      "trace": [
+        {
+          "selected_tool": null,
+          "status": "completed",
+          "step": "intent_routing"
+        },
+        {
+          "selected_tool": "policy_rag",
+          "status": "completed",
+          "step": "policy_retrieval_and_answering"
+        },
+        {
+          "selected_tool": null,
+          "status": "completed",
+          "step": "response_synthesis"
+        },
+        {
+          "metrics": {
+            "action_safety": "N/A",
+            "citation_accuracy": 1.0,
+            "clarification_or_escalation_accuracy": "N/A",
+            "evaluation_case_id": "POL-06",
+            "gold_answer_match": 0.4881,
+            "groundedness": 1.0,
+            "latency_ms": 1523.91,
+            "retrieval_top_k": 5,
+            "run_condition": "cold_start",
+            "tool_selection_accuracy": 1.0,
+            "workflow_completion": "N/A"
+          },
+          "selected_tool": null,
+          "status": "completed",
+          "step": "evaluation_metrics"
+        }
+      ],
+      "error": null
+    }
+  ]
+}

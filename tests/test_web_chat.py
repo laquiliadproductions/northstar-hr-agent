@@ -90,7 +90,7 @@ def test_chat_returns_expected_response_shape(mock_run_agent):
         }
     ]
 
-    assert data["trace"] == [
+    assert data["trace"][:3] == [
         {
             "step": "intent_routing",
             "status": "completed",
@@ -107,6 +107,40 @@ def test_chat_returns_expected_response_shape(mock_run_agent):
             "selected_tool": None,
         },
     ]
+
+    metrics_event = data["trace"][3]
+
+    assert metrics_event["step"] == "evaluation_metrics"
+    assert metrics_event["status"] == "completed"
+    assert metrics_event["selected_tool"] is None
+
+    metrics = metrics_event["metrics"]
+
+    assert set(metrics) == {
+        "groundedness",
+        "citation_accuracy",
+        "gold_answer_match",
+        "tool_selection_accuracy",
+        "workflow_completion",
+        "clarification_or_escalation_accuracy",
+        "action_safety",
+        "latency_ms",
+        "run_condition",
+        "retrieval_top_k",
+        "evaluation_case_id",
+    }
+
+    assert metrics["groundedness"] == 1.0
+    assert metrics["citation_accuracy"] == 1.0
+    assert metrics["gold_answer_match"] == "N/A"
+    assert metrics["tool_selection_accuracy"] == "N/A"
+    assert metrics["workflow_completion"] == 1.0
+    assert metrics["clarification_or_escalation_accuracy"] == "N/A"
+    assert metrics["action_safety"] == "N/A"
+    assert metrics["latency_ms"] >= 0
+    assert metrics["run_condition"] == "interactive"
+    assert metrics["retrieval_top_k"] == 5
+    assert metrics["evaluation_case_id"] == "N/A"
 
 @patch("src.web.app.run_agent", new_callable=AsyncMock)
 def test_chat_passes_employee_email_to_agent(mock_run_agent):
@@ -153,6 +187,7 @@ def test_chat_passes_employee_email_to_agent(mock_run_agent):
         end_date=None,
         requested_days=None,
         confirmed=False,
+        retrieval_top_k=5,
     )
 
     data = response.get_json()

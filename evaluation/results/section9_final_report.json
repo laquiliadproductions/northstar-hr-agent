@@ -1,0 +1,305 @@
+{
+  "schema_version": "1.0.0",
+  "report_name": "Northstar Analytics Section 9 Evaluation Results",
+  "generated_at": "2026-10-10T21:25:47.538051+00:00",
+  "evaluation_set": {
+    "path": "evaluation/northstar_section9_evaluation_set.json",
+    "case_count": 25
+  },
+  "automated_tests": {
+    "passed": 62,
+    "failed": 0,
+    "command": "pytest -q"
+  },
+  "baseline": {
+    "source": "evaluation/results/section9_baseline_results.json",
+    "overall": {
+      "groundedness": {
+        "scored_cases": 20,
+        "mean": 1.0
+      },
+      "citation_accuracy": {
+        "scored_cases": 20,
+        "mean": 1.0
+      },
+      "gold_answer_match": {
+        "scored_cases": 25,
+        "mean": 0.6586
+      },
+      "tool_selection_accuracy": {
+        "scored_cases": 25,
+        "mean": 0.96
+      },
+      "workflow_completion": {
+        "scored_cases": 13,
+        "mean": 0.8462
+      },
+      "clarification_or_escalation_accuracy": {
+        "scored_cases": 14,
+        "mean": 0.9286
+      },
+      "action_safety": {
+        "scored_cases": 19,
+        "mean": 1.0
+      },
+      "case_results": {
+        "total": 25,
+        "passed": 23,
+        "failed": 2,
+        "pass_rate": 0.92
+      }
+    },
+    "latency": {
+      "representative_query_count": 15,
+      "p50_ms": 10240.13,
+      "p95_ms": 15923.82,
+      "cold_start": {
+        "count": 1,
+        "latencies_ms": [
+          1397.34
+        ]
+      },
+      "warm_start": {
+        "count": 14,
+        "p50_ms": 10360.99,
+        "p95_ms": 15947.54
+      }
+    },
+    "interpretation": "The primary 25-case run passed 23 cases. TOOL-01 and TOOL-04 stopped after transient policy-RAG service failures; both passed when retried individually."
+  },
+  "targeted_retry": {
+    "source": "evaluation/results/section9_tool_retry_results.json",
+    "case_ids": [
+      "TOOL-01",
+      "TOOL-04"
+    ],
+    "overall": {
+      "groundedness": {
+        "scored_cases": 2,
+        "mean": 1.0
+      },
+      "citation_accuracy": {
+        "scored_cases": 2,
+        "mean": 1.0
+      },
+      "gold_answer_match": {
+        "scored_cases": 2,
+        "mean": 0.878
+      },
+      "tool_selection_accuracy": {
+        "scored_cases": 2,
+        "mean": 1.0
+      },
+      "workflow_completion": {
+        "scored_cases": 2,
+        "mean": 1.0
+      },
+      "clarification_or_escalation_accuracy": {
+        "scored_cases": 1,
+        "mean": 1.0
+      },
+      "action_safety": {
+        "scored_cases": 2,
+        "mean": 1.0
+      },
+      "case_results": {
+        "total": 2,
+        "passed": 2,
+        "failed": 0,
+        "pass_rate": 1.0
+      }
+    },
+    "interpretation": "Both transient baseline failures passed on targeted retry with all applicable groundedness, citation, tool, workflow, escalation, and safety metrics equal to 1.0."
+  },
+  "ablation": {
+    "source": "evaluation/results/section9_ablation_results.json",
+    "variable": "retrieval_top_k",
+    "conditions": {
+      "3": {
+        "metrics": {
+          "groundedness": {
+            "scored_cases": 12,
+            "mean": 0.9167
+          },
+          "citation_accuracy": {
+            "scored_cases": 12,
+            "mean": 0.9167
+          },
+          "gold_answer_match": {
+            "scored_cases": 12,
+            "mean": 0.418
+          },
+          "tool_selection_accuracy": {
+            "scored_cases": 12,
+            "mean": 1.0
+          },
+          "workflow_completion": {
+            "scored_cases": 3,
+            "mean": 1.0
+          },
+          "clarification_or_escalation_accuracy": {
+            "scored_cases": 5,
+            "mean": 1.0
+          },
+          "action_safety": {
+            "scored_cases": 6,
+            "mean": 1.0
+          },
+          "case_results": {
+            "total": 12,
+            "passed": 11,
+            "failed": 1,
+            "pass_rate": 0.9167
+          }
+        },
+        "latency": {
+          "representative_query_count": 12,
+          "p50_ms": 1781.22,
+          "p95_ms": 11943.48,
+          "cold_start": {
+            "count": 0,
+            "latencies_ms": []
+          },
+          "warm_start": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null
+          }
+        }
+      },
+      "5": {
+        "metrics": {
+          "groundedness": {
+            "scored_cases": 12,
+            "mean": 1.0
+          },
+          "citation_accuracy": {
+            "scored_cases": 12,
+            "mean": 1.0
+          },
+          "gold_answer_match": {
+            "scored_cases": 12,
+            "mean": 0.5047
+          },
+          "tool_selection_accuracy": {
+            "scored_cases": 12,
+            "mean": 1.0
+          },
+          "workflow_completion": {
+            "scored_cases": 3,
+            "mean": 1.0
+          },
+          "clarification_or_escalation_accuracy": {
+            "scored_cases": 5,
+            "mean": 1.0
+          },
+          "action_safety": {
+            "scored_cases": 6,
+            "mean": 1.0
+          },
+          "case_results": {
+            "total": 12,
+            "passed": 12,
+            "failed": 0,
+            "pass_rate": 1.0
+          }
+        },
+        "latency": {
+          "representative_query_count": 12,
+          "p50_ms": 10274.67,
+          "p95_ms": 15013.83,
+          "cold_start": {
+            "count": 0,
+            "latencies_ms": []
+          },
+          "warm_start": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null
+          }
+        }
+      }
+    },
+    "selected_configuration": {
+      "retrieval_top_k": 5,
+      "reason": "k=5 achieved 100% pass rate, groundedness, and citation accuracy across the 12 ablation cases. k=3 was faster but passed 91.67% and scored 91.67% for groundedness and citation accuracy."
+    }
+  },
+  "agent_trace_metrics": [
+    "groundedness",
+    "citation_accuracy",
+    "gold_answer_match",
+    "tool_selection_accuracy",
+    "workflow_completion",
+    "clarification_or_escalation_accuracy",
+    "action_safety",
+    "latency_ms",
+    "run_condition",
+    "retrieval_top_k",
+    "evaluation_case_id"
+  ],
+  "cold_start_note": "The reported cold-start value is the first measured request in the evaluation process. It was faster than the warm-query median and therefore should not be interpreted as evidence of a platform cold-start penalty.",
+  "artifacts": {
+    "evaluation_set": "evaluation/northstar_section9_evaluation_set.json",
+    "baseline_results": "evaluation/results/section9_baseline_results.json",
+    "retry_results": "evaluation/results/section9_tool_retry_results.json",
+    "ablation_results": "evaluation/results/section9_ablation_results.json"
+  },
+  "consolidated_partial": {
+    "source": "evaluation/results/section9_consolidated_partial_results.json",
+    "method": "The complete paced run supplies the 25-case frame. Failed service-limited observations are replaced only when another saved top_k=5 result contains a successful observation for the same case. Observation provenance is retained in observation_source.",
+    "overall": {
+      "groundedness": {
+        "scored_cases": 20,
+        "mean": 1.0
+      },
+      "citation_accuracy": {
+        "scored_cases": 20,
+        "mean": 1.0
+      },
+      "gold_answer_match": {
+        "scored_cases": 25,
+        "mean": 0.6749
+      },
+      "tool_selection_accuracy": {
+        "scored_cases": 25,
+        "mean": 0.96
+      },
+      "workflow_completion": {
+        "scored_cases": 13,
+        "mean": 0.9231
+      },
+      "clarification_or_escalation_accuracy": {
+        "scored_cases": 14,
+        "mean": 0.9286
+      },
+      "action_safety": {
+        "scored_cases": 19,
+        "mean": 1.0
+      },
+      "case_results": {
+        "total": 25,
+        "passed": 23,
+        "failed": 2,
+        "pass_rate": 0.92
+      }
+    },
+    "missing_successful_cases": [
+      "TOOL-05",
+      "SAFE-02"
+    ]
+  },
+  "rate_limit_observations": {
+    "error_type": "OpenAIRateLimitError",
+    "provider_status": 429,
+    "quota": {
+      "model": "openai/gpt-oss-120b",
+      "tokens_per_day": 200000
+    },
+    "artifacts": [
+      "evaluation/results/section9_rate_limit_stress_results.json",
+      "evaluation/results/section9_rate_limit_paced_results.json"
+    ],
+    "interpretation": "The application failed safely when the external model provider exhausted its daily token quota. No unsafe action occurred. TOOL-05 and SAFE-02 require successful reruns after the quota resets."
+  }
+}

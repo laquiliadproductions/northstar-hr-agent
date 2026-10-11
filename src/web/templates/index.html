@@ -709,6 +709,33 @@
 
 
                     traceBody.appendChild(item);
+
+
+                    const metrics =
+                        event.metrics || {};
+
+                    const metricEntries =
+                        Object.entries(metrics);
+
+
+                    if (metricEntries.length > 0) {
+                        const metricsItem =
+                            document.createElement("div");
+
+                        metricsItem.className =
+                            "trace-item";
+
+                        metricsItem.textContent =
+                            metricEntries
+                                .map(([name, value]) =>
+                                    `${name}: ${value ?? "N/A"}`
+                                )
+                                .join(" | ");
+
+                        traceBody.appendChild(
+                            metricsItem
+                        );
+                    }
                 }
 
 

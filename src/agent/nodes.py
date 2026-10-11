@@ -4,9 +4,17 @@
 
 from __future__ import annotations
 
+from config import RETRIEVAL_TOP_K
+
 
 
 from src.agent.models import AgentResult, TraceEvent
+from src.agent.policy_safety import (
+    build_sensitive_policy_question,
+    build_sensitive_refusal,
+    is_sensitive_data_request,
+    requires_policy_escalation,
+)
 
 from src.agent.rag_adapter import execute_policy_rag
 
@@ -140,9 +148,20 @@ def answer_policy_question(state: AgentState) -> dict:
 
 
 
+    user_message = state["user_message"]
+    sensitive_request = is_sensitive_data_request(
+        user_message
+    )
+    rag_question = (
+        build_sensitive_policy_question()
+        if sensitive_request
+        else user_message
+    )
+
     rag_result, rag_event = execute_policy_rag(
 
-        state["user_message"]
+        rag_question,
+        top_k=state.get("retrieval_top_k", RETRIEVAL_TOP_K),
 
     )
 
@@ -176,9 +195,15 @@ def answer_policy_question(state: AgentState) -> dict:
 
     elif rag_result.status == AnswerStatus.GROUNDED:
 
-        answer = rag_result.answer
+        answer = (
+            build_sensitive_refusal()
+            if sensitive_request
+            else rag_result.answer
+        )
 
-        escalation_required = False
+        escalation_required = requires_policy_escalation(
+            user_message
+        )
 
         answer_basis = (
 

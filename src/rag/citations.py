@@ -17,7 +17,9 @@ SOURCE_NUMBER_PATTERN = re.compile(
 )
 
 SOURCE_MARKER_NORMALIZATION_PATTERN = re.compile(
-    r"[\[【]((?:Source\s+\d+)(?:\s*,\s*Source\s+\d+)*)[\]】]",
+    r"(?:[\[【]|\()"
+    r"((?:Source\s+\d+)(?:\s*,\s*Source\s+\d+)*)"
+    r"(?:[\]】]|\))",
     flags=re.IGNORECASE,
 )
 
@@ -44,7 +46,7 @@ class Citation:
         return f"[Source {self.source_number}]"
 
 def normalize_source_markers(answer: str) -> str:
-    """Convert Unicode source markers to regular square brackets."""
+    """Convert supported source markers to regular square brackets."""
 
     def replace_group(match: re.Match[str]) -> str:
         numbers = SOURCE_NUMBER_PATTERN.findall(match.group(1))

@@ -8,7 +8,11 @@ from src.agent.pto_workflow import run_pto_workflow
 from src.agent.remote_workflow import run_remote_workflow
 from src.rag.guardrails import AnswerStatus
 
-def _fake_rag(question: str):
+def _fake_rag(
+    question: str,
+    *,
+    top_k: int,
+):
     """Return a grounded policy result without calling an LLM."""
 
     result = SimpleNamespace(

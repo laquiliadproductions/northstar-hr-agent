@@ -89,3 +89,14 @@ class CitationTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_normalize_parenthetical_source_marker() -> None:
+    answer = normalize_source_markers(
+        "The policy requires advance notice (Source 1)."
+    )
+
+    assert answer == (
+        "The policy requires advance notice [Source 1]."
+    )
+    assert extract_source_numbers(answer) == [1]

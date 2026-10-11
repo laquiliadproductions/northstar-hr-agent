@@ -43,6 +43,7 @@ class AgentState(TypedDict, total=False):
     requested_days: float | None
 
     confirmed: bool
+    retrieval_top_k: int
 
 
 

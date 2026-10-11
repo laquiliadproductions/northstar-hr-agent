@@ -19,6 +19,22 @@ PTO_ACTION_TERMS = (
     "take time off",
 )
 
+PTO_EMPLOYEE_TERMS = (
+    "my pto",
+    "my paid time off",
+    "my vacation",
+    "pto balance",
+    "vacation balance",
+    "available pto",
+    "remaining pto",
+    "how much pto do i have",
+    "do i have enough pto",
+    "how much pto can i use",
+    "pto available",
+    "any pto",
+    "days off",
+)
+
 REMOTE_WORK_TERMS = (
     "remote work",
     "work remotely",
@@ -72,13 +88,25 @@ def classify_intent(user_message: str) -> RouteDecision:
             ),
         )
 
-    if has_pto_terms:
+    has_pto_action = any(
+        term in normalized
+        for term in PTO_ACTION_TERMS
+    )
+    has_pto_employee_context = any(
+        term in normalized
+        for term in PTO_EMPLOYEE_TERMS
+    )
+
+    if has_pto_terms and (
+        has_pto_action
+        or has_pto_employee_context
+    ):
         selected_tools = [
             "lookup_employee_profile",
             "check_pto_balance",
         ]
 
-        if any(term in normalized for term in PTO_ACTION_TERMS):
+        if has_pto_action:
             selected_tools.append("mock_submit_pto_request")
 
         return RouteDecision(
@@ -86,8 +114,19 @@ def classify_intent(user_message: str) -> RouteDecision:
             rag_only=False,
             selected_tools=tuple(selected_tools),
             decision_basis=(
-                "PTO guidance requires employee data, balance data, "
-                "and policy evidence."
+                "The employee-specific PTO request requires "
+                "employee data, balance data, and policy evidence."
+            ),
+        )
+
+    if has_pto_terms:
+        return RouteDecision(
+            intent=AgentIntent.POLICY_QUESTION,
+            rag_only=True,
+            selected_tools=(),
+            decision_basis=(
+                "The request asks about PTO policy without "
+                "requiring employee-specific data or an action."
             ),
         )
 

@@ -27,6 +27,7 @@ class TraceEvent:
     policy_sources: tuple[dict[str, Any], ...] = ()
     decision_basis: str | None = None
     escalation_decision: str | None = None
+    metrics: dict[str, Any] = field(default_factory=dict)
     timestamp: str = field(
         default_factory=lambda: datetime.now(timezone.utc).isoformat()
     )
@@ -46,6 +47,7 @@ class TraceEvent:
             ],
             "decision_basis": self.decision_basis,
             "escalation_decision": self.escalation_decision,
+            "metrics": dict(self.metrics),
         }
 
 @dataclass(frozen=True)

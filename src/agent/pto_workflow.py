@@ -1,9 +1,12 @@
 """Multi-step PTO guidance workflow."""
 
 from __future__ import annotations
+
+from config import RETRIEVAL_TOP_K
 import asyncio
 from typing import Any
 from src.agent.models import AgentResult, TraceEvent
+from src.agent.policy_safety import requires_policy_escalation
 from src.agent.rag_adapter import execute_policy_rag
 from src.agent.state import AgentState
 from src.agent.pto_action import execute_pto_action
@@ -189,6 +192,7 @@ async def run_pto_workflow(state: AgentState) -> dict:
     rag_result, rag_event = await asyncio.to_thread(
         execute_policy_rag,
         policy_question,
+        top_k=state.get("retrieval_top_k", RETRIEVAL_TOP_K),
     )
     events.append(rag_event)
 
@@ -252,13 +256,19 @@ async def run_pto_workflow(state: AgentState) -> dict:
     ]
 
     requires_confirmation = False
-    escalation_required = False
+    escalation_required = requires_policy_escalation(
+        state.get("user_message", "")
+    )
     synthesis_status = "completed"
     synthesis_basis = (
         "The response combines verified employee data, PTO balance "
         "data, and grounded policy citations."
     )
-    escalation_decision = None
+    escalation_decision = (
+        "Contact People Operations to coordinate medical leave."
+        if escalation_required
+        else None
+    )
 
     if action_result is not None:
         action_status = str(

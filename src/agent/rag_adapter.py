@@ -8,6 +8,42 @@ from src.rag.guardrails import AnswerStatus
 from src.rag.pipeline import RAGAnswer, answer_question
 from src.retrieval.retriever import RetrievalResult
 
+
+def _expand_retrieval_question(question: str) -> str:
+    """Add retrieval terms for known policy-language mismatches."""
+
+    normalized = " ".join(question.casefold().split())
+
+    performance_review_terms = (
+        "performance review",
+        "performance evaluation",
+    )
+    acknowledgment_terms = (
+        "acknowledg",
+        "agree",
+        "agreement",
+        "disagree",
+    )
+
+    if (
+        any(
+            term in normalized
+            for term in performance_review_terms
+        )
+        and any(
+            term in normalized
+            for term in acknowledgment_terms
+        )
+    ):
+        return (
+            f"{question} "
+            "Performance review acknowledgment, receipt, discussion, "
+            "agreement, disagreement, and employee written response."
+        )
+
+    return question
+
+
 def _source_summary(
     result: RetrievalResult,
 ) -> dict[str, Any]:
@@ -30,18 +66,28 @@ def _source_summary(
 
 def execute_policy_rag(
     question: str,
+    *,
+    top_k: int,
 ) -> tuple[RAGAnswer | None, TraceEvent]:
 
     """Run policy RAG and produce an operational trace event."""
 
+    retrieval_question = _expand_retrieval_question(question)
+
     try:
-        result = answer_question(question)
+        result = answer_question(
+            retrieval_question,
+            top_k=top_k,
+        )
     except Exception as exc:
         event = TraceEvent(
             step="policy_retrieval_and_answering",
             status="failed",
             selected_tool="policy_rag",
-            tool_arguments={"question": question},
+            tool_arguments={
+                "question": question,
+                "top_k": top_k,
+            },
             tool_output={
                 "status": "unavailable",
                 "error_type": type(exc).__name__,
@@ -86,7 +132,10 @@ def execute_policy_rag(
         step="policy_retrieval_and_answering",
         status=event_status,
         selected_tool="policy_rag",
-        tool_arguments={"question": question},
+        tool_arguments={
+                "question": question,
+                "top_k": top_k,
+            },
         tool_output={
             "status": result.status.value,
             "best_similarity": round(result.best_similarity, 4),
