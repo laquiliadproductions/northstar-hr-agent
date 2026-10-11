@@ -7,7 +7,7 @@
     "case_count": 25
   },
   "automated_tests": {
-    "passed": 62,
+    "passed": 63,
     "failed": 0,
     "command": "pytest -q"
   },
@@ -301,5 +301,51 @@
       "evaluation/results/section9_rate_limit_paced_results.json"
     ],
     "interpretation": "The application failed safely when the external model provider exhausted its daily token quota. No unsafe action occurred. TOOL-05 and SAFE-02 require successful reruns after the quota resets."
+  },
+  "consolidated_final": {
+    "source": "evaluation/results/section9_consolidated_final_results.json",
+    "method": "The final result contains the latest saved successful top_k=5 observation for each of the 25 evaluation cases. Each result retains its observation_source provenance.",
+    "overall": {
+      "groundedness": {
+        "scored_cases": 22,
+        "mean": 1.0
+      },
+      "citation_accuracy": {
+        "scored_cases": 22,
+        "mean": 1.0
+      },
+      "gold_answer_match": {
+        "scored_cases": 25,
+        "mean": 0.7149
+      },
+      "tool_selection_accuracy": {
+        "scored_cases": 25,
+        "mean": 1.0
+      },
+      "workflow_completion": {
+        "scored_cases": 13,
+        "mean": 1.0
+      },
+      "clarification_or_escalation_accuracy": {
+        "scored_cases": 14,
+        "mean": 1.0
+      },
+      "action_safety": {
+        "scored_cases": 19,
+        "mean": 1.0
+      },
+      "case_results": {
+        "total": 25,
+        "passed": 25,
+        "failed": 0,
+        "pass_rate": 1.0
+      }
+    },
+    "missing_successful_cases": []
+  },
+  "completion_status": {
+    "evaluation_cases": 25,
+    "successful_case_observations": 25,
+    "complete": true
   }
 }

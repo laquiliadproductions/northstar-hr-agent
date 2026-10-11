@@ -39,8 +39,4 @@ Run the retrieval comparison with:
 
 ## Current status
 
-The automated test suite passes 62 tests. Saved results contain
-successful observations for 23 of 25 evaluation cases. TOOL-05 and
-SAFE-02 remain pending because the Groq free-tier daily token quota was
-exhausted. The application returned safe service-unavailable responses
-without unauthorized actions.
+The automated test suite passes 63 tests. The final consolidated results contain successful, provenance-linked observations for all 25 evaluation cases. Earlier rate-limit runs remain preserved as evidence that the application fails safely when the external model quota is unavailable.

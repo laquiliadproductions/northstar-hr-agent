@@ -41,6 +41,29 @@ def _expand_retrieval_question(question: str) -> str:
             "agreement, disagreement, and employee written response."
         )
 
+    password_action_terms = (
+        "reset",
+        "recover",
+        "recovery",
+    )
+
+    if (
+        (
+            "password" in normalized
+            or "account" in normalized
+        )
+        and any(
+            term in normalized
+            for term in password_action_terms
+        )
+    ):
+        return (
+            f"{question} "
+            "Company password reset, protected credentials, "
+            "authentication, authorized access support, and the "
+            "Security Incident Reporting Procedure."
+        )
+
     return question
 
 
