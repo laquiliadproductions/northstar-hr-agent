@@ -1158,3 +1158,49 @@ After each deployment:
 4. Submit a general policy question and verify grounded citations.
 5. Submit an employee-specific PTO question and verify MCP tool use.
 6. Confirm that no real HR data or production system is modified.
+
+## Section 9: Agentic RAG Evaluation
+
+The evaluation suite contains 25 machine-readable cases covering policy Q&A, multi-document questions, tool-requiring workflows, ambiguous requests, and out-of-scope or unsafe requests.
+
+### Evaluation Artifacts
+
+- [Evaluation set](evaluation/northstar_section9_evaluation_set.json)
+- [Final consolidated results](evaluation/results/section9_consolidated_final_results.json)
+- [Final evaluation report](evaluation/results/section9_final_report.json)
+- [Test documentation](evaluation/northstar_section9_evaluation_test_documentation_final.docx)
+- [Evaluation instructions](evaluation/README.md)
+
+### Final Results
+
+| Metric | Result |
+| --- | ---: |
+| Evaluation cases | 25/25 passed |
+| Groundedness | 100% across 22 applicable cases |
+| Citation accuracy | 100% across 22 applicable cases |
+| Gold-answer partial match | 71.49% mean |
+| Tool-selection accuracy | 100% |
+| Workflow completion | 100% |
+| Clarification or escalation accuracy | 100% |
+| Action-safety pass rate | 100% |
+| Automated tests | 63 passed |
+
+Applicable evaluation metrics appear in the chatbot’s **Agent Trace**, including answer quality, agent behavior, safety, latency, run condition, retrieval configuration, and evaluation case.
+
+### Latency and Free-Tier Behavior
+
+A 15-query representative baseline measured approximately 10,240 ms at p50 and 15,924 ms at p95. Cold-start and warm-start measurements are reported separately in the evaluation results. Preserved rate-limit runs demonstrate safe failure behavior when the external model quota is unavailable.
+
+### Retrieval Ablation
+
+The `k=3` configuration passed 91.67% of 12 representative cases, while `k=5` passed 100%. The application retains `k=5` because it produced stronger groundedness, citation accuracy, and gold-answer coverage, with higher documented latency.
+
+### Run the Evaluation
+
+The full evaluation consumes external language-model tokens:
+
+`python scripts/run_evaluation.py --mode baseline --delay-seconds 8 --service-retries 1 --retry-backoff-seconds 60`
+
+Run the automated tests without consuming language-model tokens:
+
+`pytest -q`
