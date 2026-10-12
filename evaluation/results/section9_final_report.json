@@ -347,5 +347,34 @@
     "evaluation_cases": 25,
     "successful_case_observations": 25,
     "complete": true
+  },
+  "scoring_interpretation": {
+    "completed_response_policy": {
+      "pass": "The completed response meets all applicable answer and agent-behavior criteria.",
+      "fail": "The application completes the request but does not meet one or more applicable answer, citation, workflow, clarification, escalation, or safety criteria.",
+      "not_scored": "The attempt cannot produce a completed response because of a confirmed external quota, rate limit, timeout, or provider-connectivity interruption."
+    },
+    "operational_interruptions": {
+      "primary_baseline_count": 2,
+      "primary_baseline_cases": [
+        "TOOL-01",
+        "TOOL-04"
+      ],
+      "scoring_classification": "not_scored",
+      "rerun_policy": "Rerun the case when service becomes available and score the completed observation.",
+      "evidence_policy": "Retain interrupted attempts separately as system-reliability and safe-handling evidence.",
+      "historical_note": "Additional quota-limited attempts may appear in preserved stress and paced-run files."
+    },
+    "gold_answer_match": {
+      "result": 0.7149,
+      "interpretation": "Supplementary partial-match similarity measure, not an answer-correctness rate.",
+      "accuracy_context": "All 25 completed cases met their case-specific pass criteria. Groundedness, citation accuracy, tool selection, workflow completion, clarification or escalation, and action safety were each 100 percent across applicable cases."
+    },
+    "final_case_outcome": {
+      "completed_cases": 25,
+      "passed": 25,
+      "failed": 0,
+      "pass_rate": 1.0
+    }
   }
 }
