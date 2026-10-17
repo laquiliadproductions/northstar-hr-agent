@@ -13,7 +13,9 @@ The project currently implements corpus preparation, document ingestion, local e
 | Stage 5: MCP server and tool integration | Complete | Local stdio MCP server, five discoverable tools, RAG-backed policy retrieval, structured HR data access, confirmation-gated mock operations, and agent-to-MCP execution |
 | Stage 6: Web application | Complete | Flask chatbot, HTTP endpoints, citations, supporting snippets, agent traces, and conversational employee identification |
 | Stage 7: Render deployment | Complete | Free single-service deployment, generated Chroma index, public URL, readiness checks, and cold-start documentation |
-| Full evaluation framework | Planned | Retrieval and generation metrics beyond the current automated tests |
+| Stage 8: CI/CD | Complete | GitHub Actions checks run on push and pull request; deployment is gated on passing checks |
+| Section 9: Agentic RAG evaluation | Complete | 25-case evaluation, answer-quality and agent-behavior metrics, latency, and retrieval ablation |
+| Section 10: Design documentation | Complete | Design choices, architecture diagram, safeguards, and two demo workflows documented below |
 
 ## Implemented Capabilities
 
@@ -70,63 +72,32 @@ flowchart TD
 
 The model generates answer text, but application code supplies and validates source metadata. This prevents the model from inventing document titles, sections, paths, or chunk identifiers.
 
-## Repository Structure
+## Key Repository Structure
+
+The tree below shows the main application code plus the CI and evaluation directories. Supporting project documentation is described in the submission sections below.
 
 ```text
 northstar-hr-agent/
-├── data/
-│   ├── policies/                  # Fourteen fictional HR policy documents
-│   └── structured/                # Fictional employee roster and PTO CSV data
-├── chroma_db/                     # Persistent local Chroma vector index
-├── scripts/
-│   ├── build_policy_index.py      # Rebuild the complete policy index
-│   ├── test_complex_rag.py        # Complex multi-document RAG demonstration
-│   └── run_agent.py               # Command-line entry point for agent workflows
-├── src/
-│   ├── agent/
-│   │   ├── models.py              # Agent result and trace data models
-│   │   ├── nodes.py               # Shared LangGraph agent nodes
-│   │   ├── orchestrator.py        # Top-level agent execution
-│   │   ├── pto_action.py          # Confirmation-gated PTO mock action logic
-│   │   ├── pto_workflow.py        # Multi-step PTO workflow
-│   │   ├── rag_adapter.py         # Adapter between agent workflows and RAG
-│   │   ├── remote_workflow.py     # Multi-step remote-work workflow
-│   │   ├── router.py              # Intent and workflow routing
-│   │   └── state.py               # Agent workflow state definitions
-│   ├── ingestion/
-│   │   ├── loaders.py             # Markdown, PDF, and CSV loading
-│   │   ├── chunkers.py            # Citation-friendly token chunking
-│   │   ├── embeddings.py          # Local chunk and query embeddings
-│   │   ├── vector_store.py        # Chroma storage and search
-│   │   └── citations.py           # Ingestion citation utilities
-│   ├── mcp_server/
-│   │   ├── server.py              # MCP server and registered HR tools
-│   │   └── client.py              # MCP stdio client adapter used by the agent
-│   ├── rag/
-│   │   ├── prompts.py             # Grounded prompting strategy
-│   │   ├── citations.py           # Verified answer citations and snippets
-│   │   ├── guardrails.py          # Relevance and evidence guardrails
-│   │   └── pipeline.py            # End-to-end grounded RAG orchestration
-│   ├── retrieval/
-│   │   └── retriever.py           # Ranked Chroma policy retrieval
-│   └── tools/
-│       ├── hr_data.py              # Read-only employee roster access
-│       ├── pto_data.py             # Read-only PTO balance access
-│       └── mock_actions.py         # Confirmation-gated mock HR operations
-├── tests/
-│   ├── test_agent_failures.py
-│   ├── test_agent_router.py
-│   ├── test_agent_workflows.py
-│   ├── test_citations.py
-│   ├── test_guardrails.py
-│   ├── test_hr_tools.py
-│   ├── test_mock_actions.py
-│   └── test_retriever.py
-├── config.py
-├── settings.py
-├── requirements.txt
-├── .env.example
-└── README.md
+|-- .github/workflows/             # CI/CD workflow
+|-- data/
+|   |-- policies/                  # Fictional HR policy documents
+|   `-- structured/                # Synthetic employee and PTO CSV data
+|-- evaluation/                    # Cases, scripts, reports, and results
+|-- scripts/                       # Index, evaluation, and agent entry points
+|-- src/
+|   |-- agent/                      # LangGraph workflows and routing
+|   |-- ingestion/                  # Loaders, chunking, embeddings, metadata
+|   |-- mcp_server/                 # MCP server and stdio client
+|   |-- rag/                        # Grounded answers, citations, guardrails
+|   |-- retrieval/                  # Chroma retrieval
+|   `-- tools/                      # Structured data and mock actions
+|-- tests/                         # Automated tests
+|-- ai-tooling.md                  # AI tools used and development impact
+|-- design-and-evaluation.md       # Architecture and evaluation documentation
+|-- deployed.md                    # Public URL, health endpoints, cold starts
+|-- requirements.txt
+|-- .env.example
+`-- README.md
 ```
 
 ## Stage 1: Data and Policy Corpus
@@ -250,7 +221,7 @@ The script:
 The project default is:
 
 ```python
-RETRIEVAL_TOP_K = 4
+RETRIEVAL_TOP_K = 5
 ```
 
 Complex questions may request a larger top-k value to improve multi-document recall.
@@ -447,25 +418,25 @@ All HR actions remain mock-only. Even after confirmation, no ticket, message, em
 Policy question:
 
 ```bash
-PYTHONPATH=. python scripts/run_agent "What expenses require manager approval?"
+PYTHONPATH=. python scripts/run_agent.py "What expenses require manager approval?"
 ```
 
 PTO guidance:
 
 ```bash
-PYTHONPATH=. python scripts/run_agent "What is my PTO balance?" --work-email maya.chen@northstaranalytics.com
+PYTHONPATH=. python scripts/run_agent.py "What is my PTO balance?" --work-email maya.chen@northstaranalytics.com
 ```
 
 Remote-work guidance:
 
 ```bash
-PYTHONPATH=. python scripts/run_agent "Am I eligible to work remotely?" --work-email maya.chen@northstaranalytics.com
+PYTHONPATH=. python scripts/run_agent.py "Am I eligible to work remotely?" --work-email maya.chen@northstaranalytics.com
 ```
 
 Mock PTO request:
 
 ```bash
-PYTHONPATH=. python scripts/run_agent "Submit a PTO request" --work-email maya.chen@northstaranalytics.com --start-date 2026-10-12 --end-date 2026-10-14 --requested-days 3
+PYTHONPATH=. python scripts/run_agent.py "Submit a PTO request" --work-email maya.chen@northstaranalytics.com --start-date 2026-10-12 --end-date 2026-10-14 --requested-days 3
 ```
 
 Add `--confirm` to explicitly confirm the mock action. Add `--show-trace` to display the operational trace as JSON.
@@ -474,7 +445,7 @@ Add `--confirm` to explicitly confirm the mock action. Add `--show-trace` to dis
 
 Clone the repository and enter the project directory:
 ```bash
-git clone <repository-url>
+git clone https://github.com/laquiliadproductions/northstar-hr-agent.git
 cd northstar-hr-agent
 ```
 
@@ -505,7 +476,6 @@ LLM_PROVIDER=groq
 LLM_API_KEY=your_private_key_here
 LLM_BASE_URL=https://api.groq.com/openai/v1
 LLM_MODEL=openai/gpt-oss-120b
-PYTHONHASHSEED=42
 ```
 
 Never place a real key in `.env.example`, source code, documentation, tests, screenshots, or commits.
@@ -518,9 +488,35 @@ Never place a real key in `.env.example`, source code, documentation, tests, scr
 | `LLM_API_KEY` | Private provider credential |
 | `LLM_BASE_URL` | OpenAI-compatible API endpoint |
 | `LLM_MODEL` | Provider-specific chat-model identifier |
-| `PYTHONHASHSEED` | Reproducible Python hashing seed |
+| `PYTHONHASHSEED` | Set before starting Python to make hash randomization repeatable |
 
 Provider details are environment-based. The RAG application code does not hard-code a specific API key or endpoint.
+
+## Run the Web App Locally
+
+From the activated virtual environment, build the local policy index once (and again whenever policy documents change):
+
+```bash
+python scripts/build_policy_index.py
+```
+
+Set the Python hash seed before starting the process, then start Flask:
+
+Linux or macOS:
+
+```bash
+export PYTHONHASHSEED=42
+python -m flask --app src.web.app run --host 127.0.0.1 --port 8000
+```
+
+Windows PowerShell:
+
+```powershell
+$env:PYTHONHASHSEED = "42"
+python -m flask --app src.web.app run --host 127.0.0.1 --port 8000
+```
+
+Open `http://127.0.0.1:8000/`. The local app reads the provider settings from `.env`; `LLM_API_KEY` must contain a valid key for the configured OpenAI-compatible provider. The first local embedding run may need an internet connection to download the embedding model.
 
 ## Testing
 
@@ -530,7 +526,7 @@ Run all automated tests:
 pytest -q
 ```
 
-The current suite contains 37 tests covering:
+The current automated test suite contains 63 tests covering:
 
 - Ranked retrieval conversion
 - Metadata-filter forwarding
@@ -580,19 +576,13 @@ The test suite does not require a live language-model call.
 
 ## Known Limitations
 
-- The current relevance threshold is based on a small evaluation set.
+- The relevance threshold is an empirical setting validated against the current corpus and evaluation set.
 - Dense retrieval may rank passages with related terminology even when they do not answer the question.
-- Complex questions may require a larger top-k value or future query decomposition.
+- Complex questions may require a larger top-k value; supported calls can request up to ten retrieved chunks.
 - Free-tier model availability and rate limits may change.
 - Free-tier CPU and memory constraints can make policy and multi-step agent responses slow.
 - HR actions are intentionally mock-only and do not integrate with a production HR system.
-- A larger formal evaluation dataset is still needed.
-
-## Future Enhancements
-
-- Expanded retrieval and generation evaluation
-- Free-tier performance profiling and optimization
-- Optional separate HTTP deployment for the MCP server
+- The evaluation uses 25 cases, within the project requirement of 20 to 30 cases.
 
 ## Stage 5: MCP Server and Tool Integration
 ### Architecture
@@ -641,9 +631,9 @@ The MCP implementation is located under:
 
 ```text
 src/mcp_server/
-├── __init__.py
-├── server.py
-└── client.py
+|-- __init__.py
+|-- server.py
+`-- client.py
 ```
 `server.py` defines the Northstar MCP server and registers the HR tools. The server wraps existing retrieval and HR functions rather than duplicating their business logic.
 `client.py` provides the agent-side MCP adapter. It starts the local server process, initializes an MCP `ClientSession`, invokes tools by name with structured arguments, and converts MCP responses into controlled Python dictionaries for the agent workflows.
@@ -664,6 +654,7 @@ async with stdio_client(SERVER_PARAMETERS) as streams:
             print(tool.name)
             print(tool.description)
             print(tool.input_schema)
+```
 
 The server currently advertises five MCP tools:
 
@@ -685,8 +676,8 @@ Searches the persistent Chroma policy index for semantically relevant policy evi
 
 Inputs:
 
-- `query` — required string containing the policy question or search terms
-- `top_k` — optional integer specifying the number of results; defaults to 5 and is limited to 1 through 10
+- `query` - required string containing the policy question or search terms
+- `top_k` - optional integer specifying the number of results; defaults to 5 and is limited to 1 through 10
 
 Returns ranked policy chunks containing:
 
@@ -707,9 +698,9 @@ Retrieves policy evidence from a specific indexed policy section using Chroma me
 
 Inputs:
 
-- `section` — required section name
-- `policy_title` — optional policy title used to further restrict retrieval
-- `top_k` — optional result limit; defaults to 5 and is limited to 1 through 10
+- `section` - required section name
+- `policy_title` - optional policy title used to further restrict retrieval
+- `top_k` - optional result limit; defaults to 5 and is limited to 1 through 10
 
 The tool returns matching policy chunks and citation-related source metadata. If no indexed evidence matches the requested section, it returns a controlled `not_found` response.
 
@@ -719,8 +710,8 @@ Looks up one fictional Northstar employee from the structured employee roster.
 
 Inputs:
 
-- `work_email` — optional employee work email
-- `full_name` — optional exact employee full name
+- `work_email` - optional employee work email
+- `full_name` - optional exact employee full name
 
 At least one employee identifier must be supplied. The tool returns only fields required by supported HR workflows rather than the complete roster record.
 
@@ -736,8 +727,8 @@ Looks up one fictional employee's PTO balance.
 
 Inputs:
 
-- `employee_id` — optional employee ID
-- `work_email` — optional employee work email
+- `employee_id` - optional employee ID
+- `work_email` - optional employee work email
 
 At least one identifier must be supplied. The tool returns fields including annual allowance, accrued PTO, used PTO, pending requests, current balance, available balance after pending requests, and the balance date.
 
@@ -942,18 +933,18 @@ All PTO submission behavior is simulated for demonstration purposes.
 
 ## Stage 6 - Web Application
 
-The Northstar HR Agent is available through a public Flask web application behind Nginx.
+The Northstar HR Agent is available through its public Render Flask web application.
 
 ### Public URL
 
-http://54.245.188.227/northstar/
+https://northstar-hr-agent-5uub.onrender.com/
 
 ### Endpoints
 
-- `GET /northstar/`
+- `GET /`
   - Opens the Northstar HR chatbot interface.
 
-- `POST /northstar/chat`
+- `POST /chat`
   - Accepts HR policy and workflow requests.
   - Returns:
     - final answer
@@ -963,8 +954,11 @@ http://54.245.188.227/northstar/
     - intent
     - confirmation and escalation status
 
-- `GET /northstar/health`
+- `GET /health`
   - Returns application status and MCP connectivity status.
+
+- `GET /ready`
+  - Returns readiness status for the deployed service.
 
 Example health response:
 
@@ -1063,7 +1057,7 @@ python -m pytest -q
 Current full-suite validation result:
 
 ```text
-37 passed
+63 passed
 ```
 ## Stage 7 - Render Deployment
 
@@ -1116,7 +1110,7 @@ The Render service requires:
 | `LLM_API_KEY` | Private Groq API credential |
 | `LLM_BASE_URL` | OpenAI-compatible Groq endpoint |
 | `LLM_MODEL` | Deployed model identifier |
-| `PYTHONHASHSEED` | Reproducible Python hashing seed |
+| `PYTHONHASHSEED` | Set before starting Python to make hash randomization repeatable |
 
 `LLM_API_KEY` is entered as a private Render environment variable and is never committed to Git.
 
@@ -1138,7 +1132,7 @@ Deployment status: Live and validated with the readiness endpoint, MCP health ch
 ### Free-Tier Cold Starts
 
 Render free web services spin down after periods of inactivity. The first request after a spin-down can take a minute or longer while the service starts. During a cold start, the browser may appear to wait before the chatbot loads.
-Even while the service is active, policy retrieval and multi-step agent workflows may respond slowly because the free instance has limited CPU and memory and the application performs local embedding, vector retrieval, MCP subprocess, and external model operations. Performance optimization is deferred and tracked as a known limitation.
+Even while the service is active, policy retrieval and multi-step agent workflows may respond slowly because the free instance has limited CPU and memory and the application performs local embedding, vector retrieval, MCP subprocess, and external model operations. The free service has limited CPU and memory, so policy and multi-step responses can be slow.
 
 If this occurs:
 
@@ -1158,6 +1152,12 @@ After each deployment:
 4. Submit a general policy question and verify grounded citations.
 5. Submit an employee-specific PTO question and verify MCP tool use.
 6. Confirm that no real HR data or production system is modified.
+
+## Stage 8: CI/CD
+
+GitHub Actions runs the project checks on pushes and pull requests. The workflow installs the pinned dependencies, performs an application import or startup check, runs the automated test suite, and verifies MCP tool discovery or a tool call. Deployment is gated on successful checks.
+
+To review the latest result, open the repository's **Actions** tab and select the most recent workflow run for the branch being submitted. The workflow run is the source of truth for the current pass/fail status.
 
 ## Section 9: Agentic RAG Evaluation
 
@@ -1187,11 +1187,11 @@ The evaluation suite contains 25 machine-readable cases covering policy Q&A, mul
 
 Applicable evaluation metrics appear in the chatbot's **Agent Trace**, including answer quality, agent behavior, safety, latency, run condition, retrieval configuration, and evaluation case.
 
-The 71.49% gold-answer partial match is a supplementary similarity measure, not an answer-correctness rate. It measures overlap with concise reference wording. Semantically equivalent model-generated wording, citations, explanatory context, and required policy qualifications can reduce lexical overlap. Excellent answer accuracy is demonstrated by all 25 cases meeting their pass criteria and by the 100% applicable groundedness, citation, tool-selection, workflow, clarification or escalation, and action-safety results.
+The primary evaluation run completed 23 cases; two additional attempts were interrupted by confirmed retrieval-service failures and were marked Not Scored. Those two cases were rerun after service recovery. All 25 cases passed their criteria on completed, scored attempts. The interrupted attempts remain documented as reliability evidence. The 71.49% gold-answer partial match is a supplementary lexical-overlap measure, not an answer-correctness rate; semantically equivalent wording and required context can lower the score. The 100% results apply to the 22 cases where the corresponding metrics were applicable.
 
 ### Latency and Free-Tier Behavior
 
-A 15-query representative baseline measured approximately 10,240 ms at p50 and 15,924 ms at p95. Cold-start and warm-start measurements are reported separately in the evaluation results.
+A 15-query representative baseline measured approximately 10,240 ms at p50 and 15,924 ms at p95. Cold-start and warm-start measurements are reported separately in the evaluation results. These are application request timings; the separate Render wake-up delay after spin-down can be longer.
 
 Confirmed external quota, rate-limit, timeout, or provider-connectivity interruptions are classified as **Not Scored**, not as incorrect answers. Interrupted attempts are rerun when service becomes available and remain preserved as system-reliability and safe-handling evidence.
 
@@ -1208,6 +1208,29 @@ The full evaluation consumes external language-model tokens:
 Run the automated tests without consuming language-model tokens:
 
 `pytest -q`
+
+## AI Tooling and Required Submission Files
+
+OpenAI Codex/ChatGPT was used to assist with implementation, debugging, setup guidance, and documentation. This helped accelerate routine coding and troubleshooting; generated suggestions were reviewed against the project requirements and checked through manual and automated tests. The companion `ai-tooling.md` file records these uses, what worked well, and what required correction or verification.
+
+The required companion files are included with this README and should be committed at the repository root:
+
+- `design-and-evaluation.md` - architecture, RAG and MCP design, guardrails, evaluation questions, expected answers, and results.
+- `deployed.md` - deployed application URL, health endpoint, and free-tier cold-start notes.
+- `ai-tooling.md` - AI development tools used and their impact.
+- `evaluation/` - evaluation cases, expected answers or rubrics, scripts, and reported results.
+- `src/mcp_server/` or equivalent - MCP server code and tool definitions.
+- `data/structured/` or equivalent - clearly synthetic structured HR data.
+
+The companion files contain the corresponding design/evaluation, deployment, and AI-tooling details. The README also provides an integrated project overview.
+
+### Project Submission Checklist
+
+- Share the GitHub repository with the `quantic-grader` account.
+- Submit the GitHub repository link and recorded demo presentation link through the course submission page.
+- Record a 7-10 minute screen-share with voiceover showing the deployed application completing both agentic workflows end to end.
+- For a group submission, every member must speak, appear on camera, and show government ID, as required by the project brief.
+- Include the deployed application URL in this README and keep the companion documentation and evaluation artifacts committed to the repository.
 
 ## Section 10: Design Documentation
 
