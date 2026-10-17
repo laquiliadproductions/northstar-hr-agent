@@ -113,13 +113,43 @@
             margin: 8px 0;
         }
 
-        .message-content ul {
+        .message-content ul,
+        .message-content ol {
             margin: 8px 0;
             padding-left: 28px;
         }
 
         .message-content li {
             margin: 4px 0;
+        }
+
+        .table-scroll {
+            width: 100%;
+            margin: 12px 0;
+            overflow-x: auto;
+        }
+
+        .message-content table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        .message-content th,
+        .message-content td {
+            padding: 10px;
+            border: 1px solid #bcccdc;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .message-content th {
+            background: #eef3f7;
+            color: #16324f;
+        }
+
+        .message-content tbody tr:nth-child(even) {
+            background: #f8fafc;
         }
 
         .source-marker {
@@ -366,6 +396,10 @@
         function formatInline(text) {
             return escapeHtml(text)
                 .replace(
+                    /&lt;br\s*\/?&gt;/gi,
+                    "<br>"
+                )
+                .replace(
                     /\s*\[Source\s+(\d+)\]/g,
                     ' <strong class="source-marker">' +
                     '[Source $1]</strong>'
@@ -376,8 +410,44 @@
                 )
                 .replace(
                     /\*([^*\n]+?)\*/g,
-                    "<strong>$1</strong>"
+                    "<em>$1</em>"
                 );
+        }
+
+
+        function splitTableRow(line) {
+            return line
+                .trim()
+                .replace(/^\|/, "")
+                .replace(/\|$/, "")
+                .split("|")
+                .map((cell) => cell.trim());
+        }
+
+
+        function isTableRow(line) {
+            const trimmed = line.trim();
+
+            return (
+                trimmed.startsWith("|") &&
+                trimmed.endsWith("|")
+            );
+        }
+
+
+        function isTableDivider(line) {
+            if (!isTableRow(line)) {
+                return false;
+            }
+
+            const cells = splitTableRow(line);
+
+            return (
+                cells.length > 0 &&
+                cells.every((cell) =>
+                    /^:?-{3,}:?$/.test(cell)
+                )
+            );
         }
 
 
@@ -385,47 +455,158 @@
             const lines = String(text).split("\n");
             const output = [];
 
-            let inList = false;
+            let index = 0;
+            let listType = null;
 
-            for (const line of lines) {
-                const trimmed = line.trim();
+            function closeList() {
+                if (listType) {
+                    output.push(`</${listType}>`);
+                    listType = null;
+                }
+            }
+
+            while (index < lines.length) {
+                const trimmed = lines[index].trim();
 
                 if (trimmed === "") {
+                    closeList();
+                    index += 1;
                     continue;
                 }
 
-                if (/^[-*]\s+/.test(trimmed)) {
-                    if (!inList) {
-                        output.push("<ul>");
-                        inList = true;
+                const nextLine =
+                    index + 1 < lines.length
+                        ? lines[index + 1]
+                        : "";
+
+                if (
+                    isTableRow(lines[index]) &&
+                    isTableDivider(nextLine)
+                ) {
+                    closeList();
+
+                    const headers =
+                        splitTableRow(lines[index]);
+
+                    index += 2;
+
+                    const rows = [];
+
+                    while (
+                        index < lines.length &&
+                        isTableRow(lines[index])
+                    ) {
+                        rows.push(
+                            splitTableRow(lines[index])
+                        );
+                        index += 1;
+                    }
+
+                    output.push(
+                        '<div class="table-scroll">'
+                    );
+                    output.push("<table>");
+                    output.push("<thead><tr>");
+
+                    for (const header of headers) {
+                        output.push(
+                            `<th>${formatInline(header)}</th>`
+                        );
+                    }
+
+                    output.push("</tr></thead>");
+                    output.push("<tbody>");
+
+                    for (const row of rows) {
+                        output.push("<tr>");
+
+                        for (
+                            let cellIndex = 0;
+                            cellIndex < headers.length;
+                            cellIndex += 1
+                        ) {
+                            const cell =
+                                row[cellIndex] || "";
+
+                            output.push(
+                                `<td>${formatInline(cell)}</td>`
+                            );
+                        }
+
+                        output.push("</tr>");
+                    }
+
+                    output.push("</tbody>");
+                    output.push("</table>");
+                    output.push("</div>");
+
+                    continue;
+                }
+
+                const unorderedMatch =
+                    trimmed.match(/^[-*]\s+(.+)/);
+
+                const orderedMatch =
+                    trimmed.match(/^\d+\.\s+(.+)/);
+
+                if (unorderedMatch || orderedMatch) {
+                    const desiredListType =
+                        unorderedMatch ? "ul" : "ol";
+
+                    if (listType !== desiredListType) {
+                        closeList();
+                        output.push(`<${desiredListType}>`);
+                        listType = desiredListType;
                     }
 
                     const itemText =
-                        trimmed.replace(
-                            /^[-*]\s+/,
-                            ""
-                        );
+                        unorderedMatch
+                            ? unorderedMatch[1]
+                            : orderedMatch[1];
 
                     output.push(
                         `<li>${formatInline(itemText)}</li>`
                     );
 
+                    index += 1;
                     continue;
                 }
 
-                if (inList) {
-                    output.push("</ul>");
-                    inList = false;
+                closeList();
+
+                const headingMatch =
+                    trimmed.match(/^(#{1,6})\s+(.+)/);
+
+                if (headingMatch) {
+                    const headingLevel = Math.min(
+                        headingMatch[1].length + 2,
+                        6
+                    );
+
+                    output.push(
+                        `<h${headingLevel}>` +
+                        `${formatInline(headingMatch[2])}` +
+                        `</h${headingLevel}>`
+                    );
+
+                    index += 1;
+                    continue;
+                }
+
+                if (/^---+$/.test(trimmed)) {
+                    output.push("<hr>");
+                    index += 1;
+                    continue;
                 }
 
                 output.push(
                     `<p>${formatInline(trimmed)}</p>`
                 );
+
+                index += 1;
             }
 
-            if (inList) {
-                output.push("</ul>");
-            }
+            closeList();
 
             return output.join("");
         }
